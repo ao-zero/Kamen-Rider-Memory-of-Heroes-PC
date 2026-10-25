@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kamen Rider: Memory of Heroes — PC Native Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Lighting Effects -->
+  <div class="app-background"></div>
+  <div class="ambient-glow"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Dual Accent Top Stripe (Cyclone Green & Joker Purple) -->
+  <div class="top-accent-line">
+    <div class="accent-left"></div>
+    <div class="accent-right"></div>
+  </div>
+
+  <div class="app-window">
+    <!-- Top Header -->
+    <header class="hero-header">
+      <div class="hero-banner-content">
+        <div class="brand-cluster">
+          <img src="assets/game_icon_rounded.png" alt="KR Icon" class="brand-avatar">
+          <div class="brand-info">
+            <div class="brand-top-row">
+              <h1 class="brand-title">KAMEN RIDER: MEMORY OF HEROES</h1>
+              <span class="brand-wm-badge">FANMADE PC PORT</span>
+            </div>
+            <div class="brand-meta">
+              <span>Direct Vulkan 1.3</span>
+              <span class="meta-sep">•</span>
+              <span>60 FPS Native</span>
+              <span class="meta-sep">•</span>
+              <span>by AO Zero & Bakka Sub</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Header Controls & Unified Badges -->
+        <div class="header-right-panel">
+          <div class="badge-stack">
+            <div class="header-pill">
+              <span class="dot-live"></span>
+              <span id="badgeVer">Update v1.01</span>
+              <span class="pill-sep">•</span>
+              <span>CUSA17374</span>
+            </div>
+            <div id="badgeGamepad" class="header-pill">
+              🎮 Keyboard & Mouse Active
+            </div>
+          </div>
+          <!-- Quick Language Toggle -->
+          <button id="btnQuickLang" class="btn-lang-toggle" onclick="toggleLanguage()" title="Ganti Bahasa / Switch Language">
+            <span id="langFlag">🇮🇩</span>
+            <span id="langLabel">ID / EN</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace (Sidebar + Content Pane) -->
+    <div class="workspace-layout">
+      <!-- Left Sidebar Navigation -->
+      <aside class="sidebar-nav">
+        <div class="sidebar-label" data-i18n="menu_header">MAIN MENU</div>
+        
+        <button class="nav-tab active" data-tab="play">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_play">Mulai Main</span>
+        </button>
+        
+        <button class="nav-tab" data-tab="settings">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_settings">Pengaturan</span>
+        </button>
+        
+        <button class="nav-tab" data-tab="gamepad">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="6"/><path d="M6 12h4m-2-2v4"/><circle cx="17" cy="10" r=".5" fill="currentColor"/><circle cx="15" cy="12" r=".5" fill="currentColor"/><circle cx="19" cy="12" r=".5" fill="currentColor"/><circle cx="17" cy="14" r=".5" fill="currentColor"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_gamepad">Kontrol Stik</span>
+        </button>
+        
+        <button class="nav-tab" data-tab="keyboard">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><line x1="6" y1="8" x2="6.01" y2="8"/><line x1="10" y1="8" x2="10.01" y2="8"/><line x1="14" y1="8" x2="14.01" y2="8"/><line x1="18" y1="8" x2="18.01" y2="8"/><line x1="6" y1="12" x2="6.01" y2="12"/><line x1="10" y1="12" x2="10.01" y2="12"/><line x1="14" y1="12" x2="14.01" y2="12"/><line x1="18" y1="12" x2="18.01" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_keyboard">Keyboard & Mouse</span>
+        </button>
+        
+        <button class="nav-tab" data-tab="saves">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_saves">Custom Save</span>
+        </button>
+        
+        <button class="nav-tab" data-tab="pkg">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_pkg">DLC & Update</span>
+        </button>
+        
+        <button class="nav-tab" data-tab="achievements">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_achievements">Prestasi (Trophy)</span>
+        </button>
+        
+        <button class="nav-tab" data-tab="tools">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_tools">Alat & Update</span>
+        </button>
+        
+        <button class="nav-tab" data-tab="community">
+          <span class="tab-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </span>
+          <span class="tab-text" data-i18n="tab_community">Komunitas</span>
+        </button>
+
+        <!-- Sidebar Footer Widget -->
+        <div class="sidebar-footer">
+          <div class="sidebar-ver">KR • v1.0.0-windows</div>
+          <div class="sidebar-status-line">
+            <span class="status-indicator-dot"></span>
+            <span data-i18n="system_ready">Sistem Siap 60 FPS</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Main Content Area -->
+      <main class="content-viewport">
+        <!-- ================= TAB 1: PLAY ================= -->
+        <section id="tab-play" class="tab-pane active">
+          <!-- Game Info Card -->
+          <div class="section-card game-summary-card">
+            <div class="game-status-banner">
+              <div class="status-badge-ready" id="gameReadyBadge">
+                <span class="dot-live"></span>
+                <span id="gameReadyText">Ready: CUSA17374 v01.01 (PS4 Base Game Dump)</span>
+              </div>
+              <div class="player-info-text">
+                <span class="info-label" data-i18n="profile">Profil:</span> <strong id="lblPlayerName">AO Zero</strong> &nbsp;•&nbsp; 
+                <span class="info-label">API:</span> <span class="tag-vulkan">Vulkan 1.3 Direct</span> &nbsp;•&nbsp; 
+                <span class="info-label" data-i18n="mode">Mode:</span> <span class="tag-sync">Zero-Touch Mouse Aim</span>
+              </div>
+            </div>
+
+            <div class="folder-select-group">
+              <div class="folder-path-display">
+                <svg class="folder-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <input type="text" id="inputGameDir" class="path-input-box" readonly>
+              </div>
+              <button class="btn-change-folder" onclick="browseGameDir()">
+                <span data-i18n="btn_change_folder">Change game folder...</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hero Action Play Button -->
+          <div class="launch-hero-block">
+            <button id="btnLaunch" class="btn-hero-launch" onclick="launchGame()">
+              <div class="hero-btn-content">
+                <svg class="play-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                <span id="txtLaunchBtn" data-i18n="btn_play">PLAY GAME</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Harmonized Quick Action Buttons -->
+          <div class="play-sub-actions">
+            <button class="btn-sub-action" onclick="createDesktopShortcut()">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <span data-i18n="btn_create_shortcut">Create Desktop Shortcut</span>
+            </button>
+            <button class="btn-sub-action" onclick="openGameFolder()">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <span data-i18n="btn_open_game_folder">Open Game Folder</span>
+            </button>
+            <button class="btn-sub-action" onclick="openSavesFolder()">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <span data-i18n="btn_open_saves">Open Saves Folder</span>
+            </button>
+          </div>
+
+          <!-- Compact Engine Log Window -->
+          <div class="section-card log-card">
+            <div class="section-title log-title-bar">
+              <span class="status-indicator-dot"></span>
+              <span class="title-text" data-i18n="section_log">Log & Status Engine</span>
+              <button class="btn-log-clear" onclick="clearLog()">Clear</button>
+            </div>
+            <pre id="terminalLog" class="terminal-log-box">[INIT] Kamen Rider: Memory of Heroes PC Native Suite v1.0.0 Ready.
+[VULKAN] Direct memory allocation pool (2048MB DMEM / 1024MB FMEM) enabled.
+[SCHEDULER] Windows Multimedia 1ms Precision Timer ready.
+[INPUT] Zero-Touch Mouse Look auto-sync daemon ready.</pre>
+          </div>
+        </section>
+
+        <!-- ================= TAB 2: SETTINGS (DETAILED) ================= -->
+        <section id="tab-settings" class="tab-pane">
+          <!-- 1-Click Optimization Presets -->
+          <div class="section-card preset-card">
+            <div class="section-title">
+              <span class="title-line"></span>
+              <span class="title-text" data-i18n="section_presets">1-Click Optimization Presets</span>
+              <span class="title-line"></span>
+            </div>
+            <div class="preset-button-grid">
+              <button class="btn-preset preset-potato" onclick="applyPreset('potato')">
+                <span class="preset-name">🥔 Potato PC (Max FPS)</span>
+                <span class="preset-desc">720p + AMD FSR Performance + 60 FPS</span>
+              </button>
+              <button class="btn-preset preset-balanced" onclick="applyPreset('balanced')">
+                <span class="preset-name">⚖️ Balanced (Recommended)</span>
+                <span class="preset-desc">1080p + AMD FSR 3.1 Quality + 60 FPS</span>
+              </button>
+              <button class="btn-preset preset-fidelity" onclick="applyPreset('fidelity')">
+                <span class="preset-name">💎 Native Ultra Fidelity</span>
+                <span class="preset-desc">1080p/1440p Native + 60 FPS Locked</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Performance Section -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_perf">— Performance —</span>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label class="field-label" data-i18n="lbl_fps">Target Frame Rate (FPS Limit):</label>
+                <select id="selectFps" class="form-select" onchange="onSettingChanged()">
+                  <option value="30 FPS (Locked)">30 FPS (Locked)</option>
+                  <option value="60 FPS (Native Unlock)" selected>60 FPS (Native Unlock - Recommended)</option>
+                  <option value="120 FPS (High Refresh)">120 FPS (High Refresh)</option>
+                  <option value="144 FPS (Ultra Refresh)">144 FPS (Ultra Refresh)</option>
+                  <option value="Uncapped">Uncapped (Max Output)</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="field-label" data-i18n="lbl_vsync">VSync & Presentation:</label>
+                <select id="selectVsync" class="form-select" onchange="onSettingChanged()">
+                  <option value="Mailbox (Fastest / Unlocked)" selected>Mailbox (Fastest / Low Latency - Recommended)</option>
+                  <option value="Fifo (Standard VSync)">Fifo (Standard VSync 60Hz)</option>
+                  <option value="Immediate (Tearing / Lowest)">Immediate (No VSync)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="checkbox-row-container">
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="chkCompileShaders" onchange="onSettingChanged()" checked>
+                <span class="check-box-custom"></span>
+                <span class="check-text" data-i18n="chk_async_shaders">Compile shaders in the background (Fast Math & Async Pipelines)</span>
+              </label>
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="chkShowFps" onchange="onSettingChanged()" checked>
+                <span class="check-box-custom"></span>
+                <span class="check-text" data-i18n="chk_show_fps">FPS counter in the corner</span>
+              </label>
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="chkShowPerfHud" onchange="onSettingChanged()">
+                <span class="check-box-custom"></span>
+                <span class="check-text" data-i18n="chk_show_hud">Performance & Frame Time HUD in the corner</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Display Section -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_display">— Display & Resolution —</span>
+            </div>
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label class="field-label" data-i18n="lbl_res">Internal Resolution / Render Scale:</label>
+                <select id="selectRes" class="form-select" onchange="onSettingChanged()">
+                  <option value="480p (Potato PC)">480p (Potato PC / 854x480)</option>
+                  <option value="720p (Low-End PC)">720p (Low-End PC / 1280x720)</option>
+                  <option value="1080p (Native FHD)" selected>1080p (Native Full HD / 1920x1080)</option>
+                  <option value="1440p (2K QHD)">1440p (2K Quad HD / 2560x1440)</option>
+                  <option value="4K (Ultra UHD)">4K (Ultra HD / 3840x2160)</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="field-label" data-i18n="lbl_aspect">Aspect Ratio:</label>
+                <select id="selectAspect" class="form-select" onchange="onSettingChanged()">
+                  <option value="16:9" selected>16:9 (Standard Widescreen)</option>
+                  <option value="21:9">21:9 (Ultrawide Monitor)</option>
+                  <option value="16:10">16:10 (Productivity / Laptop)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label class="field-label" data-i18n="lbl_upscaler">Upscaling Engine:</label>
+                <select id="selectUpscaler" class="form-select" onchange="onSettingChanged()">
+                  <option value="Off (Native)" selected>Off (Native Rendering)</option>
+                  <option value="AMD FSR 1 (Potato PC / Fastest)">AMD FSR 1.0 (Potato PC Boost)</option>
+                  <option value="AMD FSR 3.1 (High Quality)">AMD FSR 3.1 (High Quality Spatial)</option>
+                  <option value="NVIDIA DLSS (RTX Only)">NVIDIA DLSS (RTX Only)</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="field-label" data-i18n="lbl_upscaler_qual">Upscaler Quality:</label>
+                <select id="selectUpscalerQuality" class="form-select" onchange="onSettingChanged()">
+                  <option value="Ultra Performance (33%)">Ultra Performance (33% Render Scale)</option>
+                  <option value="Performance (50%)">Performance (50% Render Scale)</option>
+                  <option value="Balanced (58%)">Balanced (58% Render Scale)</option>
+                  <option value="Quality (67%)" selected>Quality (67% Render Scale)</option>
+                  <option value="DLAA (100%)">DLAA (100% Native Anti-Aliasing)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="checkbox-row-container">
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="chkFullscreen" onchange="onSettingChanged()">
+                <span class="check-box-custom"></span>
+                <span class="check-text" data-i18n="chk_fullscreen">Fullscreen</span>
+              </label>
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="chkBorderless" onchange="onSettingChanged()" checked>
+                <span class="check-box-custom"></span>
+                <span class="check-text" data-i18n="chk_borderless">Borderless window (Seamless Alt-Tab)</span>
+              </label>
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="chkHideLauncher" onchange="onSettingChanged()" checked>
+                <span class="check-box-custom"></span>
+                <span class="check-text" data-i18n="chk_hide_launcher">Hide launcher during gameplay</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Sound Section -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_sound">— Sound & Audio —</span>
+            </div>
+            <div class="slider-row">
+              <label class="field-label" data-i18n="lbl_volume">Master Audio Volume:</label>
+              <input type="range" id="rngVolume" min="0" max="100" value="100" class="custom-slider" oninput="onVolumeSlider(this.value)">
+              <span id="lblVolumeVal" class="slider-val-badge">100%</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 3: GAMEPAD ================= -->
+        <section id="tab-gamepad" class="tab-pane">
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_pad_mapping">— Gamepad Button Mapping —</span>
+            </div>
+            <p class="section-subtitle" data-i18n="pad_desc">Mendukung Xbox, PlayStation (DualShock / DualSense), Nintendo Switch Pro, dan Controller Universal. Klik "Ubah" untuk memetakan tombol.</p>
+
+            <div class="controller-status-banner" id="controllerStatusBox">
+              ● CONNECTED: Xbox / PlayStation / Universal Controller
+            </div>
+
+            <!-- Deadzone Slider -->
+            <div class="slider-row deadzone-box">
+              <label class="field-label" data-i18n="lbl_deadzone">Analog Stick Deadzone:</label>
+              <input type="range" id="sliderDeadzone" min="1" max="30" value="5" class="custom-slider" oninput="onDeadzoneChange(this.value)">
+              <span id="valDeadzone" class="slider-val-badge">5%</span>
+            </div>
+
+            <!-- Gamepad Remap Table -->
+            <div class="table-container">
+              <table class="remap-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="th_action">Aksi Game</th>
+                    <th data-i18n="th_assigned">Tombol Stik</th>
+                    <th data-i18n="th_remap" style="text-align: right;">Atur</th>
+                  </tr>
+                </thead>
+                <tbody id="padKeybindList">
+                  <!-- Generated dynamically in JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mapping-actions-footer">
+              <button class="btn-secondary" onclick="restorePadDefaults()" data-i18n="btn_restore_pad">Restore Default Controller</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 4: KEYBOARD & MOUSE ================= -->
+        <section id="tab-keyboard" class="tab-pane">
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_kbm_mapping">— Keyboard & Mouse Controls (Auto-Sync) —</span>
+            </div>
+            
+            <div class="mouse-sync-banner">
+              <div class="sync-banner-icon">🎯</div>
+              <div class="sync-banner-text">
+                <strong data-i18n="mouse_sync_title">Zero-Touch Mouse Aim Aktif Otomatis!</strong>
+                <p data-i18n="mouse_sync_desc">Kamera mouse langsung sinkron secara otomatis saat game dijalankan. Tidak perlu menekan tombol F7 secara manual. Kursor mouse akan terkunci di dalam game.</p>
+              </div>
+            </div>
+
+            <!-- Mouse Sensitivity Slider -->
+            <div class="slider-row deadzone-box">
+              <label class="field-label" data-i18n="lbl_mouse_sens">Sensitivitas Kamera Mouse (Look Sensitivity):</label>
+              <input type="range" id="sliderSensitivity" min="10" max="60" value="25" class="custom-slider" oninput="onSensitivityChange(this.value)">
+              <span id="valSensitivity" class="slider-val-badge">1.0x (25)</span>
+            </div>
+
+            <!-- Keyboard Remap Table -->
+            <div class="table-container">
+              <table class="remap-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="th_action">Aksi Game</th>
+                    <th data-i18n="th_assigned">Tombol Keyboard / Mouse</th>
+                    <th data-i18n="th_remap" style="text-align: right;">Atur</th>
+                  </tr>
+                </thead>
+                <tbody id="kbmKeybindList">
+                  <!-- Generated dynamically in JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mapping-actions-footer">
+              <button class="btn-secondary" onclick="restoreKbmDefaults()" data-i18n="btn_restore_kbm">Restore Default Keyboard & Mouse</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 5: SAVES (CUSTOM SAVEGAME) ================= -->
+        <section id="tab-saves" class="tab-pane">
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-line"></span>
+              <span class="title-text" data-i18n="section_saves">Custom Savegame Manager</span>
+              <span class="title-line"></span>
+            </div>
+            <p class="section-subtitle" data-i18n="saves_desc">Kelola slot penyimpanan game, backup data simpanan, pasang preset save 100% tamat, atau pulihkan backup sebelumnya.</p>
+
+            <div class="saves-action-bar">
+              <button class="btn-action-save" onclick="backupSaves()">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <span data-i18n="btn_backup_saves">Backup Semua Save</span>
+              </button>
+              <button class="btn-action-save" onclick="install100SavePreset()">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span data-i18n="btn_load_100">Pasang Save 100% Tamat</span>
+              </button>
+              <button class="btn-action-save" onclick="openSavesFolder()">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span data-i18n="btn_open_saves_folder">Buka Folder Savegame</span>
+              </button>
+              <button class="btn-action-save" onclick="refreshSavesList()">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                <span data-i18n="btn_refresh">Segarkan</span>
+              </button>
+            </div>
+
+            <!-- Detected Save Slots -->
+            <div class="saves-list-container">
+              <div class="saves-list-header" data-i18n="hdr_detected_saves">Slot Save Terdeteksi (CUSA17374):</div>
+              <div id="saveSlotsContainer" class="save-slots-grid">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Backup Archives / Restore -->
+            <div class="saves-backup-section">
+              <div class="saves-list-header" data-i18n="hdr_restore_backup">Pulihkan Backup Tersimpan:</div>
+              <div class="restore-control-row">
+                <select id="selectBackups" class="form-select">
+                  <option value="" data-i18n="opt_no_backups">Belum ada file backup tersimpan...</option>
+                </select>
+                <button class="btn-restore-save" onclick="restoreSelectedBackup()" data-i18n="btn_restore">Pulihkan Backup</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 6: DLC & PATCHES ================= -->
+        <section id="tab-pkg" class="tab-pane">
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_dlc">— DLC & Update Installer —</span>
+            </div>
+            <p class="section-subtitle" data-i18n="dlc_desc">Pasang file paket update v1.01 atau DLC PS4 (.pkg) secara otomatis ke dalam folder game.</p>
+
+            <div class="dlc-detected-box">
+              <div class="dlc-box-header" data-i18n="hdr_pkgs_found">File .PKG Terdeteksi di Folder:</div>
+              <div id="pkgListContainer" class="pkg-list-container">
+                <!-- Discovered PKGs -->
+              </div>
+            </div>
+
+            <div class="dlc-manual-browse">
+              <button class="btn-secondary" onclick="browseManualPkg()">
+                <span>📦</span> <span data-i18n="btn_browse_pkg">Pilih File PKG Manual...</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 7: ACHIEVEMENTS (TROPHY) ================= -->
+        <section id="tab-achievements" class="tab-pane">
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-line"></span>
+              <span class="title-text" data-i18n="section_achievements">Prestasi & Trophy PlayStation</span>
+              <span class="title-line"></span>
+            </div>
+
+            <!-- Trophy Stat Header (Authentic PlayStation 4 Badges) -->
+            <div class="trophy-stats-header">
+              <div class="trophy-stat-card platinum">
+                <img src="assets/custom_trophy/platinum.png" alt="Platinum" class="trophy-stat-img">
+                <span class="trophy-count" id="statPlatinum">1</span>
+                <span class="trophy-label">Platinum</span>
+              </div>
+              <div class="trophy-stat-card gold">
+                <img src="assets/custom_trophy/gold.png" alt="Gold" class="trophy-stat-img">
+                <span class="trophy-count" id="statGold">1</span>
+                <span class="trophy-label">Gold</span>
+              </div>
+              <div class="trophy-stat-card silver">
+                <img src="assets/custom_trophy/silver.png" alt="Silver" class="trophy-stat-img">
+                <span class="trophy-count" id="statSilver">10</span>
+                <span class="trophy-label">Silver</span>
+              </div>
+              <div class="trophy-stat-card bronze">
+                <img src="assets/custom_trophy/bronze.png" alt="Bronze" class="trophy-stat-img">
+                <span class="trophy-count" id="statBronze">38</span>
+                <span class="trophy-label">Bronze</span>
+              </div>
+            </div>
+
+            <!-- Filter & Test Buttons -->
+            <div class="trophy-filter-bar">
+              <button class="btn-filter active" onclick="filterTrophies('all')" data-i18n="filter_all">Semua (50)</button>
+              <button class="btn-filter" onclick="filterTrophies('unlocked')" data-i18n="filter_unlocked">Terbuka</button>
+              <button class="btn-filter" onclick="filterTrophies('locked')" data-i18n="filter_locked">Terkunci</button>
+              <div style="flex: 1;"></div>
+              <button class="btn-test-popup" onclick="testPs4Toast()" title="Test Achievement Notification Popup">
+                <span>🔔</span> <span data-i18n="btn_test_trophy">Test Notification</span>
+              </button>
+            </div>
+
+            <!-- Trophies Grid -->
+            <div id="trophyListContainer" class="trophy-grid-container">
+              <!-- Dynamically populated in JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 8: TOOLS ================= -->
+        <section id="tab-tools" class="tab-pane">
+          <!-- Updates Section -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_updates">— Updates & Versi —</span>
+            </div>
+            <div class="update-status-row">
+              <div class="update-info-text">
+                <div data-i18n="installed_ver">Versi Terpasang: <strong>v1.0.0-PC-Native</strong></div>
+                <div id="updateStatusText" class="update-badge-ok">● Anda menggunakan versi terbaru (v1.0.0)</div>
+              </div>
+              <button class="btn-secondary" onclick="checkForUpdates()">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                <span data-i18n="btn_check_updates">Check for Updates</span>
+              </button>
+            </div>
+            <div class="checkbox-row-container" style="margin-top: 10px;">
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="chkUpdateStartup" onchange="onSettingChanged()" checked>
+                <span class="check-box-custom"></span>
+                <span class="check-text" data-i18n="chk_update_startup">Check for updates when the launcher opens</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Another Installation & Settings Section -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_installation">— Pengaturan & Migrasi Instalasi —</span>
+            </div>
+            <div class="tools-btn-grid" style="grid-template-columns: 1fr 1fr;">
+              <button class="btn-tool" onclick="importSettings()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span data-i18n="btn_import_settings">Bring settings from another installation...</span>
+              </button>
+              <button class="btn-tool" onclick="resetAllSettings()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                <span data-i18n="btn_reset_settings">Reset Semua Pengaturan ke Default Pabrik</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Folders and Log Section -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_folders">— Folders and Log —</span>
+            </div>
+            <div class="tools-btn-grid" style="grid-template-columns: repeat(4, 1fr);">
+              <button class="btn-tool" onclick="openLastRunLog()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span data-i18n="btn_open_log">Open last run log</span>
+              </button>
+              <button class="btn-tool" onclick="openPortFolder()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+                <span data-i18n="btn_open_port">Open the port folder</span>
+              </button>
+              <button class="btn-tool" onclick="openGameFolder()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span data-i18n="btn_open_game">Open the game folder</span>
+              </button>
+              <button class="btn-tool" onclick="openSavesFolder()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <span data-i18n="btn_open_saves">Open saves</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hardware & Integrity Diagnostics -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_diagnostics">— Diagnosa Hardware & Integritas Game —</span>
+            </div>
+            <div class="tools-btn-grid" style="grid-template-columns: repeat(3, 1fr);">
+              <button class="btn-tool" onclick="runGpuDiagnostic()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span data-i18n="btn_run_gpu_diag">Cek Kemampuan GPU & Driver Vulkan</span>
+              </button>
+              <button class="btn-tool" onclick="verifyGameFiles()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span data-i18n="btn_verify_files">Verifikasi Integritas File Game (eboot.bin)</span>
+              </button>
+              <button class="btn-tool" onclick="cleanTempFiles()">
+                <svg class="tool-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 10 3.5 3.5-7 7-3.5-3.5z"/><path d="m2 22 5-5"/><path d="M9.5 14.5 16 8"/></svg>
+                <span data-i18n="btn_clean_temp">Bersihkan File Sementara & Crash Dump</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Desktop Shortcut Section -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_desktop">— Desktop Shortcut —</span>
+            </div>
+            <button class="btn-secondary" onclick="createDesktopShortcut()">
+              <span>🖥️</span> <span data-i18n="btn_create_shortcut">Create Desktop Shortcut</span>
+            </button>
+          </div>
+
+          <!-- Shader Cache Section -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_shader">— Shader Cache —</span>
+            </div>
+            <p class="section-subtitle" data-i18n="shader_desc">Shader disimpan agar sesi berikutnya berjalan mulus. Hapus cache jika Anda baru saja update driver GPU atau mengalami glitch grafis.</p>
+            <button class="btn-secondary" onclick="clearShaderCache()" data-i18n="btn_clear_shader">Clear the shader cache</button>
+          </div>
+
+          <!-- Launcher Language -->
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-text" data-i18n="section_lang">— Launcher Language / Bahasa —</span>
+            </div>
+            <div class="form-field" style="max-width: 320px;">
+              <select id="selectLang" class="form-select" onchange="onLanguageSelect(this.value)">
+                <option value="id" selected>🇮🇩 Bahasa Indonesia</option>
+                <option value="en">🇬🇧 English</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Fanmade Identity & Integrity Section -->
+          <div class="section-card wm-branding-card">
+            <div class="section-title">
+              <span class="title-text">— Fanmade Port Identity & Integrity —</span>
+            </div>
+            <div class="wm-branding-content">
+              <img src="assets/wm_badge.png" alt="AO Zero Logo" class="wm-card-img">
+              <div class="wm-card-text">
+                <div class="wm-title">KAMEN RIDER MEMORY OF HEROES — FANMADE PC PORT</div>
+                <div class="wm-subtitle">Created & Optimized by <strong>AO Zero</strong> | Partnered with <strong>Bakka Sub</strong></div>
+                <div class="wm-notice">This launcher is custom-built for the community. Free distribution — not for resale or unauthorized re-branding.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 9: COMMUNITY & CREDITS ================= -->
+        <section id="tab-community" class="tab-pane">
+          <div class="section-card">
+            <div class="section-title">
+              <span class="title-line"></span>
+              <span class="title-text" data-i18n="section_community">Komunitas & Pengembang</span>
+              <span class="title-line"></span>
+            </div>
+
+            <div class="community-grid">
+              <div class="community-card">
+                <div class="comm-avatar">AO</div>
+                <div class="comm-name">AO Zero</div>
+                <div class="comm-role">Port Lead & Engine Optimizer</div>
+                <p class="comm-desc" data-i18n="lead_desc">Pengembang utama Native PC Port Launcher, optimasi Vulkan 1.3 60 FPS, Auto-Sync Mouse Look, dan Remapper Input.</p>
+              </div>
+
+              <div class="community-card partner-card" onclick="openExternal('https://www.bakkasub.my.id')">
+                <img src="assets/bakkasub_logo.png" alt="Bakka Sub Logo" class="comm-avatar-img">
+                <div class="comm-name">Bakka Sub</div>
+                <div class="comm-role">Community Partner & Fansub</div>
+                <p class="comm-desc" data-i18n="partner_desc">Penyedia takarir (fansub) Tokusatsu Indonesia terdepan. Kunjungi www.bakkasub.my.id untuk update Kamen Rider terbaru!</p>
+                <div class="comm-link">🌐 www.bakkasub.my.id</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Persistent Footer HUD -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="hud-dot" id="statusDot"></span>
+        <span id="footerStatus">STATUS: READY TO PLAY (60 FPS NATIVE)</span>
+      </div>
+      <div class="footer-right">
+        <span>KAMEN RIDER: MEMORY OF HEROES</span>
+        <span class="meta-sep">•</span>
+        <span>PC EDITION</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Gamepad Button Picker Modal -->
+  <div id="modalPadPicker" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="modalActionTitle">Pilih Tombol Gamepad</div>
+        <button class="modal-close" onclick="closePadPicker()">✕</button>
+      </div>
+      <p class="modal-hint" data-i18n="modal_hint">Klik tombol yang diinginkan pada stik controller Anda di bawah ini:</p>
+      <div class="pad-btn-grid" id="padButtonsGrid">
+        <!-- Buttons injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentic Achievement Notification Toast -->
+  <div id="ps4TrophyToast" class="ps4-trophy-toast" onclick="dismissTrophyToast()">
+    <div class="ps4-toast-cup-wrapper">
+      <img id="ps4ToastArt" src="assets/trophies/trop000.png" class="ps4-toast-art" alt="Art">
+      <img id="ps4ToastCup" src="assets/custom_trophy/platinum.png" class="ps4-toast-cup" alt="Cup">
+    </div>
+    <div class="ps4-toast-body">
+      <div class="ps4-toast-top-row">
+        <span class="ps4-toast-badge">🏆 ACHIEVEMENT UNLOCKED</span>
+        <span id="ps4ToastTier" class="ps4-toast-tier">PLATINUM</span>
+      </div>
+      <div id="ps4ToastTitle" class="ps4-toast-title">Total Conquest</div>
+      <div id="ps4ToastDesc" class="ps4-toast-desc">Acquired all trophies.</div>
+    </div>
+  </div>
+
+  <!-- Authentic Trophy Audio Chime -->
+  <audio id="trophyChime" src="assets/custom_trophy/trophy.wav" preload="auto"></audio>
+
+  <script src="app.js"></script>
+</body>
+</html>

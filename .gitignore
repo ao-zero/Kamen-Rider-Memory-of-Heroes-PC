@@ -1,0 +1,63 @@
+# ==============================================================================
+# Kamen Rider: Memory of Heroes — PC Native Edition (.gitignore)
+# Keep repository 100% compliant with GitHub Terms of Service & Open Source Standards
+# ==============================================================================
+
+# Compiled Executables & Dynamic Libraries (NEVER commit binaries to git tree!)
+*.exe
+*.dll
+*.so
+*.dylib
+*.pyd
+
+# Binary Distributions & Portable Release Folders
+Kamen-Rider-Memory-of-Heroes-PC-Edition/
+Kamen-Rider-Memory-of-Heroes-PC/
+dist/
+build/
+*.spec
+*.spec.bak
+github_push.bat
+README-PC.txt
+
+# Protected Source & Build Scripts
+launcher.py
+build.bat
+
+# Python Runtime & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# Large Compressed Archives (Upload to GitHub Releases or Cloud Mirrors instead)
+*.zip
+*.7z
+*.rar
+*.tar.gz
+
+# Copyrighted Game Dumps & PS4 Packages (NEVER host copyrighted dumps)
+CUSA17374/
+data/
+user/
+*.pkg
+*.pkg.part
+*.iso
+*.dump
+ShadPs4Plus-PkgExtractor*/
+_temp_*/
+
+# Local Core Runtime & User Data
+bin/
+saves_backup/
+launcher.ini
+*.log
+_temp_create_shortcut.vbs
+
+# IDE & OS Metadata
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store

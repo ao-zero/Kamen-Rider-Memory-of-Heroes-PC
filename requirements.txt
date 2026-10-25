@@ -1,0 +1,7 @@
+# ==============================================================================
+# KAMEN RIDER: MEMORY OF HEROES - PC NATIVE EDITION REQUIREMENTS
+# Project Lead: AO Zero | Partner: Bakka Sub (www.bakkasub.my.id)
+# ==============================================================================
+pywebview>=5.0.0
+pythonnet>=3.0.0
+pyinstaller>=6.0.0
