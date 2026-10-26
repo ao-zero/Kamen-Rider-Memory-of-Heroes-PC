@@ -99,7 +99,7 @@ Built specifically around the heroic trio:
 > **No Game Assets Included**: This repository and release packages contain **ONLY** the launcher and optimization runtime tools. You must provide your own legally dumped copy of the game.
 
 ### Step 1: Download the Launcher
-- Download **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.0.0.zip`** from the [Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) tab and extract it to a folder of your choice.
+- Download **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.0.1.zip`** from the [Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) tab and extract it to a folder of your choice.
 - This repository is a **source reference only**. The complete, ready-to-run launcher ships inside the ZIP above.
 
 ### Step 2: Add Your Game Dump
@@ -175,7 +175,7 @@ licensing files for community review and audit.
 The finished, ready-to-run application is distributed separately as a pre-built ZIP in the
 [Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) section:
 
-- **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.0.0.zip`** - ready-to-run launcher + runtime.
+- **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.0.1.zip`** - ready-to-run launcher + runtime.
 
 To protect the port's core entry point, the following files are intentionally **not published**
 in this repository:
