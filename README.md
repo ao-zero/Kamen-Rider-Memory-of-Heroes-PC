@@ -215,8 +215,6 @@ in this repository:
   *Community Partner:* [www.bakkasub.my.id](https://www.bakkasub.my.id)  
   *Attribution:* Indonesian Tokusatsu fansub provider, Indonesian subtitle localization, Tokusatsu preservation, and community partner.
 
-- 
-
 ---
 
 ## Legal Disclaimer
