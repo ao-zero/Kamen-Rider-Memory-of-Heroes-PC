@@ -31,13 +31,13 @@ const I18N = {
     btn_open_saves: "Buka Folder Save",
     section_log: "Log & Status Engine",
     section_presets: "1-Click Optimization Presets",
-    section_perf: "— Performance —",
+    section_perf: "Performance",
     lbl_fps: "Target Frame Rate (FPS Limit):",
     lbl_vsync: "VSync & Presentation:",
     chk_async_shaders: "Compile shaders in the background (Fast Math & Async Pipelines)",
     chk_show_fps: "FPS counter in the corner",
     chk_show_hud: "Performance & Frame Time HUD in the corner",
-    section_display: "— Display & Resolution —",
+    section_display: "Display & Resolution",
     lbl_res: "Internal Resolution / Render Scale:",
     lbl_aspect: "Aspect Ratio:",
     lbl_upscaler: "Upscaling Engine:",
@@ -45,9 +45,9 @@ const I18N = {
     chk_fullscreen: "Fullscreen",
     chk_borderless: "Borderless window (Seamless Alt-Tab)",
     chk_hide_launcher: "Sembunyikan launcher saat game berjalan",
-    section_sound: "— Sound & Audio —",
+    section_sound: "Sound & Audio",
     lbl_volume: "Master Audio Volume:",
-    section_pad_mapping: "— Gamepad Button Mapping —",
+    section_pad_mapping: "Gamepad Button Mapping",
     pad_desc: "Mendukung Xbox, PlayStation (DualShock / DualSense), Switch Pro, dan Controller Universal. Klik 'Ubah' untuk memetakan tombol.",
     lbl_deadzone: "Analog Stick Deadzone:",
     th_action: "Aksi Game",
@@ -55,7 +55,7 @@ const I18N = {
     th_remap: "Atur",
     btn_remap: "Ubah",
     btn_restore_pad: "Kembalikan Default Controller",
-    section_kbm_mapping: "— Keyboard & Mouse Controls (Auto-Sync) —",
+    section_kbm_mapping: "Keyboard & Mouse Controls",
     mouse_sync_title: "Zero-Touch Mouse Aim Aktif Otomatis!",
     mouse_sync_desc: "Kamera mouse langsung sinkron secara otomatis saat game dijalankan. Tidak perlu menekan tombol F7 secara manual. Kursor mouse akan terkunci di dalam game.",
     lbl_mouse_sens: "Sensitivitas Kamera Mouse (Look Sensitivity):",
@@ -70,7 +70,7 @@ const I18N = {
     hdr_restore_backup: "Pulihkan Backup Tersimpan:",
     opt_no_backups: "Belum ada file backup tersimpan...",
     btn_restore: "Pulihkan Backup",
-    section_dlc: "— DLC & Update Installer —",
+    section_dlc: "DLC & Update Installer",
     dlc_desc: "Pasang file paket update v1.01 atau DLC PS4 (.pkg) secara otomatis ke dalam folder game.",
     hdr_pkgs_found: "File .PKG Terdeteksi di Folder:",
     btn_browse_pkg: "Pilih File PKG Manual...",
@@ -79,27 +79,27 @@ const I18N = {
     filter_unlocked: "Terbuka",
     filter_locked: "Terkunci",
     btn_test_trophy: "Tes Notifikasi",
-    section_updates: "— Updates & Versi —",
+    section_updates: "Updates & Versi",
     installed_ver: "Versi Terpasang: v1.0.0-PC-Native",
     btn_check_updates: "Check for Updates",
     chk_update_startup: "Check for updates when the launcher opens",
-    section_installation: "— Pengaturan & Migrasi Instalasi —",
+    section_installation: "Pengaturan & Migrasi Instalasi",
     btn_import_settings: "Bring settings from another installation...",
     btn_reset_settings: "Reset Semua Pengaturan ke Default Pabrik",
-    section_folders: "— Folders and Log —",
+    section_folders: "Folders and Log",
     btn_open_log: "Open last run log",
     btn_open_port: "Open the port folder",
     btn_open_game: "Open the game folder",
     chk_detailed_log: "Save a detailed log (with frame statistics)",
-    section_diagnostics: "— Diagnosa Hardware & Integritas Game —",
+    section_diagnostics: "Diagnosa Hardware & Integritas Game",
     btn_run_gpu_diag: "Cek Kemampuan GPU & Driver Vulkan",
     btn_verify_files: "Verifikasi Integritas File Game (eboot.bin)",
     btn_clean_temp: "Bersihkan File Sementara & Crash Dump",
-    section_desktop: "— Desktop Shortcut —",
-    section_shader: "— Shader Cache —",
+    section_desktop: "Desktop Shortcut",
+    section_shader: "Shader Cache",
     shader_desc: "Shader disimpan agar sesi berikutnya berjalan mulus. Hapus cache jika Anda baru saja update driver GPU atau mengalami glitch grafis.",
     btn_clear_shader: "Clear the shader cache",
-    section_lang: "— Launcher Language / Bahasa —",
+    section_lang: "Launcher Language",
     section_community: "Komunitas & Pengembang",
     lead_desc: "Pengembang utama Native PC Port Launcher, optimasi Vulkan 1.3 60 FPS, Auto-Sync Mouse Look, dan Remapper Input.",
     partner_desc: "Penyedia takarir (fansub) Tokusatsu Indonesia terdepan. Kunjungi www.bakkasub.my.id untuk update Kamen Rider terbaru!",
@@ -129,13 +129,13 @@ const I18N = {
     btn_open_saves: "Open Saves Folder",
     section_log: "Engine Log & Status",
     section_presets: "1-Click Optimization Presets",
-    section_perf: "— Performance —",
+    section_perf: "Performance",
     lbl_fps: "Target Frame Rate (FPS Limit):",
     lbl_vsync: "VSync & Presentation:",
     chk_async_shaders: "Compile shaders in the background (Fast Math & Async Pipelines)",
     chk_show_fps: "FPS counter in the corner",
     chk_show_hud: "Performance & Frame Time HUD in the corner",
-    section_display: "— Display & Resolution —",
+    section_display: "Display & Resolution",
     lbl_res: "Internal Resolution / Render Scale:",
     lbl_aspect: "Aspect Ratio:",
     lbl_upscaler: "Upscaling Engine:",
@@ -143,9 +143,9 @@ const I18N = {
     chk_fullscreen: "Fullscreen",
     chk_borderless: "Borderless window (Seamless Alt-Tab)",
     chk_hide_launcher: "Hide launcher during gameplay",
-    section_sound: "— Sound & Audio —",
+    section_sound: "Sound & Audio",
     lbl_volume: "Master Audio Volume:",
-    section_pad_mapping: "— Gamepad Button Mapping —",
+    section_pad_mapping: "Gamepad Button Mapping",
     pad_desc: "Supports Xbox, PlayStation (DualShock / DualSense), Switch Pro, and generic controllers. Press 'Change' to map buttons.",
     lbl_deadzone: "Analog Stick Deadzone:",
     th_action: "Game Action",
@@ -153,7 +153,7 @@ const I18N = {
     th_remap: "Remap",
     btn_remap: "Change",
     btn_restore_pad: "Restore Controller Defaults",
-    section_kbm_mapping: "— Keyboard & Mouse Controls (Auto-Sync) —",
+    section_kbm_mapping: "Keyboard & Mouse Controls",
     mouse_sync_title: "Zero-Touch Mouse Aim Auto-Engaged!",
     mouse_sync_desc: "Mouse camera aim synchronizes automatically upon boot. No manual F7 press required. Cursor locks seamlessly inside the game.",
     lbl_mouse_sens: "Mouse Camera Look Sensitivity:",
@@ -168,7 +168,7 @@ const I18N = {
     hdr_restore_backup: "Restore Existing Backup:",
     opt_no_backups: "No backup archives found...",
     btn_restore: "Restore Backup",
-    section_dlc: "— DLC & Update Installer —",
+    section_dlc: "DLC & Update Installer",
     dlc_desc: "Install v1.01 update or PS4 DLC package (.pkg) files directly into your game directory.",
     hdr_pkgs_found: "Detected .PKG Files in Root:",
     btn_browse_pkg: "Browse Manual PKG...",
@@ -177,27 +177,27 @@ const I18N = {
     filter_unlocked: "Unlocked",
     filter_locked: "Locked",
     btn_test_trophy: "Test Notification",
-    section_updates: "— Updates & Version —",
+    section_updates: "Updates & Version",
     installed_ver: "Installed Version: v1.0.0-PC-Native",
     btn_check_updates: "Check for Updates",
     chk_update_startup: "Check for updates when the launcher opens",
-    section_installation: "— Settings & Installation Migration —",
+    section_installation: "Settings & Installation Migration",
     btn_import_settings: "Bring settings from another installation...",
     btn_reset_settings: "Reset All Settings to Factory Default",
-    section_folders: "— Folders and Log —",
+    section_folders: "Folders and Log",
     btn_open_log: "Open last run log",
     btn_open_port: "Open the port folder",
     btn_open_game: "Open the game folder",
     chk_detailed_log: "Save a detailed log (with frame statistics)",
-    section_diagnostics: "— Hardware Diagnostics & File Integrity —",
+    section_diagnostics: "Hardware Diagnostics & File Integrity",
     btn_run_gpu_diag: "Check GPU & Vulkan Driver Capabilities",
     btn_verify_files: "Verify Game File Integrity (eboot.bin)",
     btn_clean_temp: "Clean Temporary Files & Crash Traces",
-    section_desktop: "— Desktop Shortcut —",
-    section_shader: "— Shader Cache —",
+    section_desktop: "Desktop Shortcut",
+    section_shader: "Shader Cache",
     shader_desc: "Shaders are preserved for smooth future sessions. Clear shader cache only after GPU driver updates or graphic glitches.",
     btn_clear_shader: "Clear the shader cache",
-    section_lang: "— Launcher Language —",
+    section_lang: "Launcher Language",
     section_community: "Community & Credits",
     lead_desc: "Lead developer of the Native PC Port Launcher, Vulkan 1.3 60 FPS optimizer, Zero-Touch Mouse Aim, and Input Remapper.",
     partner_desc: "Leading Indonesian Tokusatsu fansub provider. Visit www.bakkasub.my.id for the latest Kamen Rider subtitle releases!",
@@ -210,11 +210,13 @@ let cachedKeybinds = {};
 let cachedTrophies = [];
 let activeTrophyFilter = 'all';
 let currentMappingAction = null;
+let initStarted = false;
+let initDone = false;
 
 // ==========================================================================
 // LANGUAGE SWITCHER
 // ==========================================================================
-function setLanguage(lang) {
+function applyLanguage(lang, persist) {
   currentLang = lang;
   const dict = I18N[lang] || I18N.id;
 
@@ -244,8 +246,14 @@ function setLanguage(lang) {
   // Re-render trophies to update localized descriptions
   renderTrophies(cachedTrophies, activeTrophyFilter);
 
-  // Persist language setting
-  onSettingChanged();
+  if (persist) {
+    // Persist language setting (skipped during initial load to avoid clobbering)
+    onSettingChanged();
+  }
+}
+
+function setLanguage(lang) {
+  applyLanguage(lang, true);
 }
 
 function toggleLanguage() {
@@ -318,11 +326,13 @@ window.onGameExited = function() {
 // INITIALIZATION
 // ==========================================================================
 function initLauncher() {
+  if (initStarted) return; // guard against DOMContentLoaded + pywebviewready firing twice
   if (window.pywebview && window.pywebview.api) {
+    initStarted = true;
     window.pywebview.api.get_initial_data().then(data => {
-      // 1. Language
+      // 1. Language (do NOT persist yet: settings controls are still at HTML defaults)
       if (data.language) {
-        setLanguage(data.language);
+        applyLanguage(data.language, false);
       }
 
       // 2. Paths & Player Name
@@ -371,8 +381,18 @@ function initLauncher() {
 
       loadKeybinds();
       appendLog('[READY] System configuration & engine shaders synchronized.');
+
+      // Only after real values are loaded do we allow saves to write through
+      initDone = true;
+
+      // Honor the "check updates on startup" toggle automatically
+      const shouldCheckStartup = document.getElementById('chkUpdateStartup');
+      if (shouldCheckStartup && shouldCheckStartup.checked) {
+        checkForUpdates(true);
+      }
     }).catch(err => {
       console.error("Failed to load initial data:", err);
+      initDone = true;
       loadKeybinds();
     });
   } else {
@@ -388,6 +408,7 @@ window.addEventListener('DOMContentLoaded', initLauncher);
 // ==========================================================================
 function onSettingChanged() {
   if (!window.pywebview || !window.pywebview.api) return;
+  if (!initDone) return; // do not persist default/pre-init control values
   const settings = {
     game_dir: document.getElementById('inputGameDir').value,
     resolution: document.getElementById('selectRes').value,
@@ -698,17 +719,17 @@ function dismissTrophyToast() {
   }, 320);
 }
 
-function filterTrophies(type) {
+function filterTrophies(type, btn) {
   activeTrophyFilter = type;
   document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (btn) btn.classList.add('active');
   renderTrophies(cachedTrophies, type);
 }
 
 // ==========================================================================
 // AUTO UPDATER & LOGS
 // ==========================================================================
-function checkForUpdates() {
+function checkForUpdates(silent) {
   const status = document.getElementById('updateStatusText');
   if (status) status.textContent = "Checking GitHub Releases...";
   
@@ -716,13 +737,17 @@ function checkForUpdates() {
     window.pywebview.api.check_updates().then(res => {
       if (res.up_to_date) {
         if (status) status.textContent = `● You are running the latest version (${res.current})`;
-        alert(`You are up to date! Installed: ${res.current}`);
+        if (!silent) alert(`You are up to date! Installed: ${res.current}`);
       } else {
         if (status) status.textContent = `● New update available: ${res.latest}`;
-        if (confirm(`New update available: ${res.latest}\nWould you like to open the GitHub Releases page?`)) {
-          window.pywebview.api.open_external(res.url);
+        if (!silent) {
+          if (confirm(`New update available: ${res.latest}\nWould you like to open the GitHub Releases page?`)) {
+            window.pywebview.api.open_external(res.url);
+          }
         }
       }
+    }).catch(() => {
+      if (status) status.textContent = '● Could not reach the update server.';
     });
   }
 }
@@ -909,7 +934,7 @@ function renderKeybindTables(binds) {
       <td><strong>${getActionLabel(act)}</strong></td>
       <td><span class="key-badge">${val.toUpperCase()}</span></td>
       <td style="text-align: right;">
-        <button class="btn-remap-sm" onclick="startKbmListen('${act}')">${remapBtnText}</button>
+        <button class="btn-remap-sm" onclick="startKbmListen('${act}', this)">${remapBtnText}</button>
       </td>
     `;
     kbmTable.appendChild(tr);
@@ -1020,6 +1045,14 @@ function closePadPicker() {
   currentMappingAction = null;
 }
 
+// Close the pad picker with Escape or by clicking the backdrop (R-32 / R-26)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePadPicker();
+});
+document.getElementById('modalPadPicker').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closePadPicker();
+});
+
 function selectPadButton(btnId) {
   if (currentMappingAction) {
     cachedKeybinds[currentMappingAction] = btnId;
@@ -1033,13 +1066,12 @@ function selectPadButton(btnId) {
 }
 
 // KBM Key Listener
-function startKbmListen(actionKey) {
-  const btn = event ? event.target : document.activeElement;
-  const original = btn ? btn.textContent : "Ubah";
+function startKbmListen(actionKey, btn) {
+  btn = btn || (typeof event !== 'undefined' && event ? event.target : null) || document.activeElement;
   if (btn) {
     btn.textContent = currentLang === 'id' ? "Tekan Tombol / Klik..." : "Press Key / Click...";
-    btn.style.background = "#FFB703";
-    btn.style.color = "#000";
+    btn.style.background = "var(--accent)";
+    btn.style.color = "#0D1510";
   }
 
   let finished = false;

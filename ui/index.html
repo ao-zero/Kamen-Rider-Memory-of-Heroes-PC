@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kamen Rider: Memory of Heroes — PC Native Edition</title>
+  <title>Kamen Rider: Memory of Heroes - PC Native Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -240,7 +240,7 @@
           <!-- Performance Section -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_perf">— Performance —</span>
+              <span class="title-text" data-i18n="section_perf">Performance</span>
             </div>
             <div class="form-grid-2">
               <div class="form-field">
@@ -285,7 +285,7 @@
           <!-- Display Section -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_display">— Display & Resolution —</span>
+              <span class="title-text" data-i18n="section_display">Display & Resolution</span>
             </div>
             <div class="form-grid-2">
               <div class="form-field">
@@ -352,7 +352,7 @@
           <!-- Sound Section -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_sound">— Sound & Audio —</span>
+              <span class="title-text" data-i18n="section_sound">Sound & Audio</span>
             </div>
             <div class="slider-row">
               <label class="field-label" data-i18n="lbl_volume">Master Audio Volume:</label>
@@ -366,7 +366,7 @@
         <section id="tab-gamepad" class="tab-pane">
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_pad_mapping">— Gamepad Button Mapping —</span>
+              <span class="title-text" data-i18n="section_pad_mapping">Gamepad Button Mapping</span>
             </div>
             <p class="section-subtitle" data-i18n="pad_desc">Mendukung Xbox, PlayStation (DualShock / DualSense), Nintendo Switch Pro, dan Controller Universal. Klik "Ubah" untuk memetakan tombol.</p>
 
@@ -407,7 +407,7 @@
         <section id="tab-keyboard" class="tab-pane">
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_kbm_mapping">— Keyboard & Mouse Controls (Auto-Sync) —</span>
+              <span class="title-text" data-i18n="section_kbm_mapping">Keyboard & Mouse Controls</span>
             </div>
             
             <div class="mouse-sync-banner">
@@ -501,7 +501,7 @@
         <section id="tab-pkg" class="tab-pane">
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_dlc">— DLC & Update Installer —</span>
+              <span class="title-text" data-i18n="section_dlc">DLC & Update Installer</span>
             </div>
             <p class="section-subtitle" data-i18n="dlc_desc">Pasang file paket update v1.01 atau DLC PS4 (.pkg) secara otomatis ke dalam folder game.</p>
 
@@ -555,9 +555,9 @@
 
             <!-- Filter & Test Buttons -->
             <div class="trophy-filter-bar">
-              <button class="btn-filter active" onclick="filterTrophies('all')" data-i18n="filter_all">Semua (50)</button>
-              <button class="btn-filter" onclick="filterTrophies('unlocked')" data-i18n="filter_unlocked">Terbuka</button>
-              <button class="btn-filter" onclick="filterTrophies('locked')" data-i18n="filter_locked">Terkunci</button>
+              <button class="btn-filter active" onclick="filterTrophies('all', this)" data-i18n="filter_all">Semua (50)</button>
+              <button class="btn-filter" onclick="filterTrophies('unlocked', this)" data-i18n="filter_unlocked">Terbuka</button>
+              <button class="btn-filter" onclick="filterTrophies('locked', this)" data-i18n="filter_locked">Terkunci</button>
               <div style="flex: 1;"></div>
               <button class="btn-test-popup" onclick="testPs4Toast()" title="Test Achievement Notification Popup">
                 <span>🔔</span> <span data-i18n="btn_test_trophy">Test Notification</span>
@@ -576,7 +576,7 @@
           <!-- Updates Section -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_updates">— Updates & Versi —</span>
+              <span class="title-text" data-i18n="section_updates">Updates & Versi</span>
             </div>
             <div class="update-status-row">
               <div class="update-info-text">
@@ -600,7 +600,7 @@
           <!-- Another Installation & Settings Section -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_installation">— Pengaturan & Migrasi Instalasi —</span>
+              <span class="title-text" data-i18n="section_installation">Pengaturan & Migrasi Instalasi</span>
             </div>
             <div class="tools-btn-grid" style="grid-template-columns: 1fr 1fr;">
               <button class="btn-tool" onclick="importSettings()">
@@ -617,7 +617,7 @@
           <!-- Folders and Log Section -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_folders">— Folders and Log —</span>
+              <span class="title-text" data-i18n="section_folders">Folders and Log</span>
             </div>
             <div class="tools-btn-grid" style="grid-template-columns: repeat(4, 1fr);">
               <button class="btn-tool" onclick="openLastRunLog()">
@@ -642,7 +642,7 @@
           <!-- Hardware & Integrity Diagnostics -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_diagnostics">— Diagnosa Hardware & Integritas Game —</span>
+              <span class="title-text" data-i18n="section_diagnostics">Diagnosa Hardware & Integritas Game</span>
             </div>
             <div class="tools-btn-grid" style="grid-template-columns: repeat(3, 1fr);">
               <button class="btn-tool" onclick="runGpuDiagnostic()">
@@ -663,7 +663,7 @@
           <!-- Desktop Shortcut Section -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_desktop">— Desktop Shortcut —</span>
+              <span class="title-text" data-i18n="section_desktop">Desktop Shortcut</span>
             </div>
             <button class="btn-secondary" onclick="createDesktopShortcut()">
               <span>🖥️</span> <span data-i18n="btn_create_shortcut">Create Desktop Shortcut</span>
@@ -673,7 +673,7 @@
           <!-- Shader Cache Section -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_shader">— Shader Cache —</span>
+              <span class="title-text" data-i18n="section_shader">Shader Cache</span>
             </div>
             <p class="section-subtitle" data-i18n="shader_desc">Shader disimpan agar sesi berikutnya berjalan mulus. Hapus cache jika Anda baru saja update driver GPU atau mengalami glitch grafis.</p>
             <button class="btn-secondary" onclick="clearShaderCache()" data-i18n="btn_clear_shader">Clear the shader cache</button>
@@ -682,7 +682,7 @@
           <!-- Launcher Language -->
           <div class="section-card">
             <div class="section-title">
-              <span class="title-text" data-i18n="section_lang">— Launcher Language / Bahasa —</span>
+              <span class="title-text" data-i18n="section_lang">Launcher Language</span>
             </div>
             <div class="form-field" style="max-width: 320px;">
               <select id="selectLang" class="form-select" onchange="onLanguageSelect(this.value)">
@@ -695,14 +695,14 @@
           <!-- Fanmade Identity & Integrity Section -->
           <div class="section-card wm-branding-card">
             <div class="section-title">
-              <span class="title-text">— Fanmade Port Identity & Integrity —</span>
+              <span class="title-text">Fanmade Port Identity & Integrity</span>
             </div>
             <div class="wm-branding-content">
               <img src="assets/wm_badge.png" alt="AO Zero Logo" class="wm-card-img">
               <div class="wm-card-text">
-                <div class="wm-title">KAMEN RIDER MEMORY OF HEROES — FANMADE PC PORT</div>
+                <div class="wm-title">KAMEN RIDER MEMORY OF HEROES · FANMADE PC PORT</div>
                 <div class="wm-subtitle">Created & Optimized by <strong>AO Zero</strong> | Partnered with <strong>Bakka Sub</strong></div>
-                <div class="wm-notice">This launcher is custom-built for the community. Free distribution — not for resale or unauthorized re-branding.</div>
+                <div class="wm-notice">This launcher is custom-built for the community. Free distribution, not for resale or unauthorized re-branding.</div>
               </div>
             </div>
           </div>

