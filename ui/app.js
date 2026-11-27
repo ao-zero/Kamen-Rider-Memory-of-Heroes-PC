@@ -231,26 +231,100 @@ let initStarted = false;
 let initDone = false;
 
 // ==========================================================================
-// THEME SWITCHER (NEUBRUTALISM DARK / LIGHT)
+// THEME SWITCHER (CLEAN DESKTOP DARK / LIGHT)
 // ==========================================================================
 function applyTheme(theme, persist) {
   currentTheme = (theme === 'light') ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', currentTheme);
   const lbl = document.getElementById('themeLabel');
-  if (lbl) lbl.textContent = currentTheme === 'dark' ? 'DARK' : 'LIGHT';
-  const svg = document.getElementById('themeIconSvg');
-  if (svg) {
-    if (currentTheme === 'dark') {
-      svg.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-    } else {
-      svg.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-    }
-  }
+  if (lbl) lbl.textContent = currentTheme === 'dark' ? 'Dark' : 'Light';
   if (persist) onSettingChanged();
 }
 
 function toggleTheme() {
   applyTheme(currentTheme === 'dark' ? 'light' : 'dark', true);
+}
+
+function switchTab(tabKey) {
+  document.querySelectorAll('.nav-tab').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-tab') === tabKey);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => {
+    p.classList.toggle('active', p.id === `tab-${tabKey}`);
+  });
+}
+
+function switchControlsSub(sub) {
+  const isPad = (sub === 'gamepad');
+  const bPad = document.getElementById('subTabBtnPad');
+  const bKbm = document.getElementById('subTabBtnKbm');
+  const vPad = document.getElementById('sub-gamepad');
+  const vKbm = document.getElementById('sub-keyboard');
+  if (bPad) bPad.classList.toggle('active', isPad);
+  if (bKbm) bKbm.classList.toggle('active', !isPad);
+  if (vPad) vPad.classList.toggle('active', isPad);
+  if (vKbm) vKbm.classList.toggle('active', !isPad);
+}
+
+function syncOverviewSummary() {
+  const res = (document.getElementById('selectRes')?.value || '1080p').split(' ')[0];
+  const fpsFull = document.getElementById('selectFps')?.value || '60 FPS (Native Unlock)';
+  const fpsShort = fpsFull.split(' ')[0] + ' FPS';
+  const up = document.getElementById('selectUpscaler')?.value || 'Off (Native)';
+  const upShort = up.startsWith('Off') ? 'Native' : up.split('(')[0].trim();
+
+  const kvRender = document.getElementById('kvRenderSummary');
+  if (kvRender) kvRender.textContent = `${res} · ${fpsShort} · ${upShort}`;
+  const footFps = document.getElementById('footFpsLabel');
+  if (footFps) footFps.textContent = fpsShort;
+
+  // Sync Quick Overrides segmented pills
+  document.querySelectorAll('#segGroupFps .seg-opt').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-val') === fpsFull);
+  });
+  const isFs = document.getElementById('chkFullscreen')?.checked;
+  const isBl = document.getElementById('chkBorderless')?.checked;
+  const dispMode = isFs ? 'fullscreen' : (isBl ? 'borderless' : 'window');
+  document.querySelectorAll('#segGroupDisplay .seg-opt').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-val') === dispMode);
+  });
+  const showFps = document.getElementById('chkShowFps')?.checked;
+  document.querySelectorAll('#segGroupHud .seg-opt').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-val') === (showFps ? 'on' : 'off'));
+  });
+}
+
+function setQuickFps(val) {
+  const sel = document.getElementById('selectFps');
+  if (sel) sel.value = val;
+  syncOverviewSummary();
+  onSettingChanged();
+}
+
+function setQuickDisplay(mode) {
+  const fs = document.getElementById('chkFullscreen');
+  const bl = document.getElementById('chkBorderless');
+  if (fs) fs.checked = (mode === 'fullscreen');
+  if (bl) bl.checked = (mode === 'borderless');
+  syncOverviewSummary();
+  onSettingChanged();
+}
+
+function setQuickFpsHud(on) {
+  const chk = document.getElementById('chkShowFps');
+  if (chk) chk.checked = !!on;
+  syncOverviewSummary();
+  onSettingChanged();
+}
+
+function triggerIndoPatch(wantEnabled) {
+  const sel = document.getElementById('selectIndoPatch');
+  if (sel) sel.value = wantEnabled ? 'on' : 'off';
+  applyIndoPatchNow();
+}
+
+function quickToggleIndoPatch() {
+  triggerIndoPatch(!indoPatchEnabled);
 }
 
 // ==========================================================================
@@ -262,42 +336,47 @@ function updateIndoPatchUI(status) {
   const subTag = document.getElementById('lblSubStatus');
   const meta = document.getElementById('indoPatchMeta');
   const btn = document.getElementById('btnApplyIndoPatch');
+  const heroTxt = document.getElementById('txtHeroIndo');
+  const navBadge = document.getElementById('navIndoBadge');
+  const segOrig = document.getElementById('segSubOrig');
+  const segIndo = document.getElementById('segSubIndo');
 
   if (!status) return;
   indoPatchEnabled = !!status.applied;
 
   if (sel) sel.value = indoPatchEnabled ? 'on' : 'off';
+  if (segOrig) segOrig.classList.toggle('active', !indoPatchEnabled);
+  if (segIndo) segIndo.classList.toggle('active', indoPatchEnabled);
+  if (heroTxt) heroTxt.textContent = indoPatchEnabled ? 'Patch Indo: Active' : 'Patch Indo: Off';
+  if (navBadge) {
+    navBadge.textContent = indoPatchEnabled ? 'ID' : 'EN';
+    navBadge.className = indoPatchEnabled ? 'nav-badge' : 'nav-badge muted';
+  }
 
   if (pill) {
-    pill.classList.remove('active', 'original', 'working', 'error');
+    pill.classList.remove('neutral', 'working', 'error');
     if (!status.game_found) {
       pill.classList.add('error');
-      pill.textContent = currentLang === 'id' ? 'GAME BELUM DITEMUKAN' : 'GAME NOT FOUND';
+      pill.textContent = currentLang === 'id' ? 'Game tidak ditemukan' : 'Game not found';
     } else if (indoPatchEnabled) {
-      pill.classList.add('active');
-      pill.textContent = `AKTIF • BAKKA SUB v${status.version || '1.0.0'}`;
+      pill.innerHTML = `<span class="dot-green"></span> Active · v${status.version || '1.0.0'}`;
     } else {
-      pill.classList.add('original');
-      pill.textContent = 'ORIGINAL (EN/JP)';
+      pill.classList.add('neutral');
+      pill.textContent = 'Original (EN/JP)';
     }
   }
 
   if (subTag) {
-    if (indoPatchEnabled) {
-      subTag.className = 'tag-sub-id';
-      subTag.textContent = 'Indonesia (Bakka Sub)';
-    } else {
-      subTag.className = 'tag-sub-orig';
-      subTag.textContent = 'Original (EN/JP)';
-    }
+    subTag.className = indoPatchEnabled ? 'spec-value green' : 'spec-value';
+    subTag.textContent = indoPatchEnabled ? 'Bahasa Indonesia (Bakka Sub)' : 'Original (EN/JP)';
   }
 
   if (meta) {
     const cnt = status.translated_count || 0;
     const bak = status.backup_exists
       ? (currentLang === 'id' ? 'Backup vanilla aman' : 'Vanilla backup safe')
-      : (currentLang === 'id' ? 'Backup otomatis saat pertama aktif' : 'Auto-backup on first apply');
-    meta.innerHTML = `<strong>${I18N[currentLang].lbl_patch_info}</strong> Bakka Sub x AO Zero v${status.version || '1.0.0'} • ${cnt} ${currentLang === 'id' ? 'baris teks' : 'strings'} • ${bak}`;
+      : (currentLang === 'id' ? 'Auto-backup saat pertama aktif' : 'Auto-backup on first apply');
+    meta.textContent = `patches/id_patch.json · v${status.version || '1.0.0'} · ${cnt} strings · ${bak}`;
   }
 
   if (btn) btn.disabled = indoPatchBusy || !status.game_found;
@@ -472,6 +551,11 @@ function initLauncher() {
 
       // 2. Paths & Player Name
       document.getElementById('inputGameDir').value = data.game_dir || '';
+      const dirDisp = document.getElementById('lblGameDirDisplay');
+      if (dirDisp && data.game_dir) {
+        dirDisp.textContent = data.game_dir;
+        dirDisp.title = data.game_dir;
+      }
       if (data.player_name) {
         const pName = document.getElementById('lblPlayerName');
         if (pName) pName.textContent = data.player_name;
@@ -499,9 +583,12 @@ function initLauncher() {
 
       // 4. Badges & Gamepad
       if (data.app_ver) {
-        document.getElementById('badgeVer').textContent = `● UPDATE v${data.app_ver}`;
-        document.getElementById('gameReadyText').textContent = `Ready: CUSA17374 v${data.app_ver} (PS4 Base Game Dump)`;
+        const bv = document.getElementById('badgeVer');
+        if (bv) bv.textContent = `v${data.app_ver}`;
+        const kv = document.getElementById('kvVersion');
+        if (kv) kv.textContent = `${data.app_ver} (CUSA17374)`;
       }
+      syncOverviewSummary();
       if (data.gamepad) {
         window.onGamepadChanged(data.gamepad);
       }
@@ -565,6 +652,7 @@ function onSettingChanged() {
     indo_patch: indoPatchEnabled
   };
   window.pywebview.api.save_settings(settings);
+  syncOverviewSummary();
 }
 
 function onVolumeSlider(val) {

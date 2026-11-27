@@ -62,9 +62,9 @@ Built specifically around the heroic trio:
 - **Pure-Python Unity 2017.4 Patcher (`scripts/indo_patcher.py`):** Safely patches `CUSA17374/Media/sharedassets0.assets` using `patches/id_patch.json` with zero external dependencies and full UTF-8 support.
 - **Automatic Vanilla Backup & Restore:** Creates an untouched backup of your original game file in `bin/user/vanilla_backup/` before patching, allowing instant 1-click restoration back to Original (EN/JP) anytime.
 
-### Neubrutalism UI (Dark Mode Default + Light Mode Toggle)
-- Bold, crisp Neubrutalist desktop interface with zero blurs, zero gradients, high-contrast typography, tactile offset shadows, and monochrome SVG icons.
-- Switch between **Dark Mode** (default) and **Light Mode** anytime from the top header.
+### Clean Desktop UI (Dark & Light Mode)
+- Minimalist desktop interface with single-game hero banner, 2×2 structured spec cards, segmented Quick Overrides, zero emojis, and full Dark / Light mode toggle.
+- UI layout inspired by **[XSEmu](https://github.com/zortos293/xsemu)** (GPL-2.0).
 
 ### Full Bilingual Support (Indonesian & English)
 - **Instant Reactive Language Switcher:** Switch between **Bahasa Indonesia (ID)** and **English (EN)** with a single click on the header button (`ID / EN`) or inside the Tools tab.
@@ -186,27 +186,19 @@ Kamen-Rider-Memory-of-Heroes-PC-Edition/
 
 ## Repository Contents & Distribution
 
-This repository is the **safe source reference** for the PC Native Edition. It publishes the
-launcher's user interface (`ui/`), backend modules (`scripts/`), assets, documentation, and
-licensing files for community review and audit.
+This repository is **100% open-source** (GPL-2.0-or-later) and publishes the complete launcher source code (`launcher.py`), PyInstaller build script (`build.bat`, `Kamen Rider Memory of Heroes.spec`), UI (`ui/`), backend modules (`scripts/`), built-in Indonesian subtitle patch (`patches/id_patch.json`), assets, and documentation.
 
-The finished, ready-to-run application is distributed separately as a pre-built ZIP in the
-[Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) section:
+You can either build from source (`pip install -r requirements.txt` & `build.bat`) or download the pre-built portable ZIP from the [Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) section:
 
-- **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.0.1.zip`** - ready-to-run launcher + runtime.
-
-To protect the port's core entry point, the following files are intentionally **not published**
-in this repository:
-
-- `launcher.py` - main pywebview application entry point.
-- `build.bat` - one-click PyInstaller build helper.
-
-> Note: You cannot build the standalone executable from this repository alone. Use the
-> official pre-built ZIP from the Releases section to run the launcher.
+- **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.2.0.zip`** - ready-to-run launcher + runtime.
 
 ---
 
 ## Acknowledgments & Technical References
+
+- **[XSEmu](https://github.com/zortos293/xsemu)** *(by zortos293 · GPL-2.0)*  
+  *Repository:* [zortos293/xsemu](https://github.com/zortos293/xsemu)  
+  *Attribution:* Primary UI/UX design inspiration for the Clean Desktop launcher layout, single-game hero detail view, 2×2 hairline spec cards, and segmented Quick Overrides.
 
 - **[shadPS4 Emulator](https://github.com/shadps4-emu/shadPS4)**  
   *Official Site:* [shadps4.net](https://shadps4.net/) &bull; *GitHub:* [shadps4-emu/shadPS4](https://github.com/shadps4-emu/shadPS4)  

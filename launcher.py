@@ -405,7 +405,7 @@ class LauncherAPI:
         return {"started": True}
 
     def check_updates(self):
-        current_version = "v1.1.0-PC-Native"
+        current_version = "v1.2.0-PC-Native"
         try:
             req = urllib.request.Request(
                 "https://api.github.com/repos/ao-zero/kamen-rider-memory-of-heroes-pc/releases/latest",
@@ -553,7 +553,7 @@ def main():
         width=1120,
         height=720,
         min_size=(860, 600),
-        background_color="#141418"
+        background_color="#0B0C0E"
     )
 
     threading.Thread(target=start_controller_listener, daemon=True).start()
