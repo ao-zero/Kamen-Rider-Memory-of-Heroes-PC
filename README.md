@@ -13,6 +13,19 @@
   <img src="https://img.shields.io/badge/License-GPL--2.0-blue?style=for-the-badge" alt="License" />
 </p>
 
+> **Available Editions (AO Zero & Bakka Sub):**
+> - **PC Native Edition (Windows x64 — This Repo):** https://github.com/ao-zero/Kamen-Rider-Memory-of-Heroes-PC
+> - **Android ARM64 Port (`nixport` Edition):** https://github.com/ao-zero/Kamen-Rider-Memory-of-Heroes-Android
+
+---
+
+## Available Editions
+
+| Platform | Repository | Status |
+| :--- | :--- | :--- |
+| **Windows PC (x64)** | [ao-zero/Kamen-Rider-Memory-of-Heroes-PC](https://github.com/ao-zero/Kamen-Rider-Memory-of-Heroes-PC) *(This Repo)* | Ready (`v1.2.0`) |
+| **Android ARM64 (`nixport`)** | [ao-zero/Kamen-Rider-Memory-of-Heroes-Android](https://github.com/ao-zero/Kamen-Rider-Memory-of-Heroes-Android) | Companion Android Port |
+
 ---
 
 ## Overview
