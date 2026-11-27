@@ -299,7 +299,9 @@ def sync_engine_config(
 
             gen = cfg.setdefault("General", {})
             gen["show_fps_counter"] = (ov_mode != "off")
-            gen["discord_rpc_enabled"] = bool(discord_rpc)
+            # Always keep engine's built-in shadPS4 Discord RPC disabled so it never
+            # overrides the Launcher's own Discord Rich Presence with "shadPS4".
+            gen["discord_rpc_enabled"] = False
             gen["show_splash"] = False
             gen["dev_kit_mode"] = False
             try:
@@ -547,10 +549,29 @@ def launch_game(
     # 3. Start auto-sync mouse and window title daemon
     threading.Thread(target=monitor_and_sync_game, args=(proc,), daemon=True).start()
 
+    # 4. Start real-time CPU/GPU/RAM/VRAM Perf HUD overlay if Detailed mode is selected
+    if ov_mode == "detailed":
+        try:
+            try:
+                from .perf_overlay import PerfOverlay
+            except (ImportError, ValueError):
+                from perf_overlay import PerfOverlay
+            hud = PerfOverlay(proc, resolution=resolution, fps=fps)
+            hud.start()
+            proc._kr_perf_overlay = hud
+        except Exception as e:
+            print(f"[PERF HUD] Warning: Could not start PerfOverlay: {e}")
+
     return proc
 
 def end_session(proc=None):
-    """Release resources acquired by launch_game (log handle, 1ms timer, keep-awake flag)."""
+    """Release resources acquired by launch_game (log handle, Perf HUD, 1ms timer, keep-awake flag)."""
+    hud = getattr(proc, "_kr_perf_overlay", None) if proc is not None else None
+    if hud is not None:
+        try:
+            hud.stop()
+        except Exception:
+            pass
     log_file = getattr(proc, "_kr_log_file", None) if proc is not None else None
     if log_file is not None:
         try:

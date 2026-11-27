@@ -66,6 +66,7 @@ import auto_updater
 import session_tracker
 import diagnostics
 import discord_rpc
+import perf_overlay
 import ctypes
 import urllib.request
 
@@ -200,7 +201,7 @@ class LauncherAPI:
         self.game_info = get_game_info(self.game_dir)
         self.game_ver = self.game_info.get("APP_VER", "01.00")
         self.active_proc = None
-        self.rpc = discord_rpc.DiscordRPC()
+        self.rpc = discord_rpc.DiscordRPC(client_id=self.ini_data.get("discord_client_id", ""))
         rpc_enabled = (str(self.ini_data.get("discord_rpc", "true")).lower() == "true")
         self.rpc.set_enabled(rpc_enabled)
         if rpc_enabled:
