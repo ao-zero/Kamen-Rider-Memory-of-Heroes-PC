@@ -230,6 +230,21 @@ class PerfOverlay:
         user32.SetWindowPos.argtypes = [wintypes.HWND, wintypes.HWND, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, wintypes.UINT]
         user32.InvalidateRect.argtypes = [wintypes.HWND, ctypes.c_void_p, wintypes.BOOL]
         user32.DestroyWindow.argtypes = [wintypes.HWND]
+        user32.IsWindow.argtypes = [wintypes.HWND]
+        user32.IsWindow.restype = wintypes.BOOL
+        user32.IsWindowVisible.argtypes = [wintypes.HWND]
+        user32.IsWindowVisible.restype = wintypes.BOOL
+        user32.IsIconic.argtypes = [wintypes.HWND]
+        user32.IsIconic.restype = wintypes.BOOL
+        user32.GetClientRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
+        user32.GetClientRect.restype = wintypes.BOOL
+        user32.ClientToScreen.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.POINT)]
+        user32.ClientToScreen.restype = wintypes.BOOL
+        user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+        user32.GetWindowThreadProcessId.restype = wintypes.DWORD
+        user32.GetWindowTextLengthW.argtypes = [wintypes.HWND]
+        user32.GetWindowTextLengthW.restype = ctypes.c_int
+        user32.GetForegroundWindow.restype = wintypes.HWND
         user32.BeginPaint.argtypes = [wintypes.HWND, ctypes.POINTER(_PAINTSTRUCT)]
         user32.BeginPaint.restype = wintypes.HDC
         user32.EndPaint.argtypes = [wintypes.HWND, ctypes.POINTER(_PAINTSTRUCT)]
@@ -268,31 +283,77 @@ class PerfOverlay:
         WM_TIMER = 0x0113
         WM_DESTROY = 0x0002
         HWND_TOPMOST = wintypes.HWND(-1)
-        SWP_NOMOVE = 0x0002
         SWP_NOSIZE = 0x0001
         SWP_NOACTIVATE = 0x0010
+        SW_HIDE = 0
+        SW_SHOWNOACTIVATE = 4
+
+        game_pid = getattr(self.proc, "pid", 0)
+        game_hwnd = None
+        WNDENUMPROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+        def _find_game_hwnd():
+            nonlocal game_hwnd
+            if not game_pid:
+                return None
+            if game_hwnd and user32.IsWindow(game_hwnd) and user32.IsWindowVisible(game_hwnd):
+                return game_hwnd
+            found = [None]
+            def _cb(h, lp):
+                if not user32.IsWindowVisible(h):
+                    return True
+                pid = wintypes.DWORD(0)
+                user32.GetWindowThreadProcessId(h, ctypes.byref(pid))
+                if pid.value == game_pid and user32.GetWindowTextLengthW(h) > 0:
+                    found[0] = h
+                    return False
+                return True
+            user32.EnumWindows(WNDENUMPROC(_cb), 0)
+            game_hwnd = found[0]
+            return game_hwnd
+
+        tick_count = 0
 
         def wnd_proc(hwnd, msg, wparam, lparam):
-            nonlocal hdr_text, body_text
+            nonlocal hdr_text, body_text, tick_count
             if msg == WM_TIMER:
                 if self._stop_evt.is_set() or (self.proc is not None and self.proc.poll() is not None):
                     user32.DestroyWindow(hwnd)
                     return 0
-                elapsed = int(time.time() - t_start)
-                mm, ss = divmod(elapsed, 60)
-                cpu = mon.get_cpu_percent()
-                r_used, r_tot, r_pct = mon.get_ram_info()
-                g_mb = mon.get_game_ram_mb()
-                hdr_text = f"KR PERF HUD  {mm:02d}:{ss:02d}"
-                body_text = (
-                    f"CPU  : {cpu:4.1f}%\n"
-                    f"GPU  : {mon._gpu_text}\n"
-                    f"RAM  : {r_used:.1f}/{r_tot:.0f} GB ({r_pct}%)\n"
-                    f"GAME : {g_mb:,.0f} MB\n"
-                    f"MODE : {self.res_short} | {self.fps_short}"
-                )
-                user32.SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE)
-                user32.InvalidateRect(hwnd, None, True)
+
+                # Anchor strictly inside the top-left corner of the game's client area
+                if game_pid:
+                    gh = _find_game_hwnd()
+                    if not gh or user32.IsIconic(gh):
+                        user32.ShowWindow(hwnd, SW_HIDE)
+                        return 0
+                    pt = wintypes.POINT(0, 0)
+                    if user32.ClientToScreen(gh, ctypes.byref(pt)):
+                        # Hide if user switched to another window (so HUD never floats over other apps)
+                        fg = user32.GetForegroundWindow()
+                        if fg and fg != gh and fg != hwnd:
+                            user32.ShowWindow(hwnd, SW_HIDE)
+                            return 0
+                        user32.SetWindowPos(hwnd, HWND_TOPMOST, pt.x + 12, pt.y + 12, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE)
+                        user32.ShowWindow(hwnd, SW_SHOWNOACTIVATE)
+
+                tick_count += 1
+                # Refresh heavy metrics every ~0.8s (4 ticks of 200ms)
+                if tick_count == 1 or tick_count % 4 == 0:
+                    elapsed = int(time.time() - t_start)
+                    mm, ss = divmod(elapsed, 60)
+                    cpu = mon.get_cpu_percent()
+                    r_used, r_tot, r_pct = mon.get_ram_info()
+                    g_mb = mon.get_game_ram_mb()
+                    hdr_text = f"KR PERF HUD  {mm:02d}:{ss:02d}"
+                    body_text = (
+                        f"CPU  : {cpu:4.1f}%\n"
+                        f"GPU  : {mon._gpu_text}\n"
+                        f"RAM  : {r_used:.1f}/{r_tot:.0f} GB ({r_pct}%)\n"
+                        f"GAME : {g_mb:,.0f} MB\n"
+                        f"MODE : {self.res_short} | {self.fps_short}"
+                    )
+                    user32.InvalidateRect(hwnd, None, True)
                 return 0
             elif msg == WM_PAINT:
                 ps = _PAINTSTRUCT()
@@ -343,11 +404,12 @@ class PerfOverlay:
             if not hwnd:
                 return
 
-            # 85% opacity (217/255)
+            # 85% opacity (217/255); start hidden until game window appears if tracking a PID
             user32.SetLayeredWindowAttributes(hwnd, 0, 217, 0x00000002)
-            user32.ShowWindow(hwnd, 4)  # SW_SHOWNOACTIVATE
-            user32.UpdateWindow(hwnd)
-            user32.SetTimer(hwnd, 1, 900, None)
+            if not game_pid:
+                user32.ShowWindow(hwnd, SW_SHOWNOACTIVATE)
+                user32.UpdateWindow(hwnd)
+            user32.SetTimer(hwnd, 1, 200, None)
 
             msg = wintypes.MSG()
             while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
