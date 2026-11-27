@@ -70,7 +70,7 @@
       <button class="mini-pill" id="btnThemeToggle" onclick="toggleTheme()" title="Switch Dark / Light Mode">
         <span id="themeLabel">Dark</span>
       </button>
-      <button class="mini-pill" id="btnQuickLang" onclick="toggleLanguage()" title="Switch Language (ID / EN)">
+      <button class="mini-pill" id="btnQuickLang" onclick="toggleLanguage()" title="Switch Language (ID / EN / ES / PT-BR / PT-PT)">
         <span id="langLabel">ID</span>
       </button>
     </div>
@@ -83,7 +83,7 @@
     <section id="tab-play" class="tab-pane active">
       <div class="hero-banner">
         <div class="hero-top">
-          <div class="hero-crumb" id="footerStatus">CUSA17374 · PC Native Edition v1.3.0</div>
+          <div class="hero-crumb" id="footerStatus">CUSA17374 · PC Native Edition v1.3.1</div>
         </div>
         <div class="hero-bottom">
           <img src="assets/game_icon_rounded.png" alt="Cover" class="hero-poster">
@@ -101,8 +101,8 @@
           <div class="update-banner-sub" id="updateBannerSub">Click Download &amp; Install to update automatically while keeping your game dump &amp; saves safe.</div>
         </div>
         <div class="update-banner-actions">
-          <button class="btn-secondary" style="height:32px;font-size:12px;" onclick="openUpdateReleasePage()">View Notes</button>
-          <button id="btnStartAutoUpdate" class="btn-primary" style="height:32px;padding:0 14px;font-size:12px;" onclick="startAutoUpdate()">Download &amp; Install</button>
+          <button class="btn-secondary" style="height:32px;font-size:12px;" onclick="openUpdateReleasePage()" data-i18n="btn_view_notes">View Notes</button>
+          <button id="btnStartAutoUpdate" class="btn-primary" style="height:32px;padding:0 14px;font-size:12px;" onclick="startAutoUpdate()" data-i18n="btn_download_install">Download &amp; Install</button>
         </div>
         <div id="updateProgressWrap" class="update-progress-wrap">
           <div class="update-progress-track"><div id="updateProgressBar" class="update-progress-fill"></div></div>
@@ -124,7 +124,7 @@
         </div>
 
         <div class="action-right">
-          <span class="runs-with-label">Runs with</span>
+          <span class="runs-with-label" data-i18n="lbl_runs_with">Runs with</span>
           <button class="runner-select-pill" onclick="switchTab('pkg')">
             <span class="runner-dot-icon">S</span>
             <span>shadPS4</span>
@@ -150,22 +150,22 @@
               <button class="head-action" onclick="verifyGameFiles()" data-i18n="btn_verify_short">Verify</button>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Version</span>
+              <span class="spec-label" data-i18n="lbl_version">Version</span>
               <span class="spec-value mono" id="kvVersion">01.01 (CUSA17374)</span>
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Subtitle</span>
+              <span class="spec-label" data-i18n="lbl_subtitle">Subtitle</span>
               <span class="spec-value" id="lblSubStatus">Original (EN/JP)</span>
-              <button class="head-action" onclick="quickToggleIndoPatch()">Switch</button>
+              <button class="head-action" onclick="quickToggleIndoPatch()" data-i18n="btn_switch_short">Switch</button>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Port Lead</span>
+              <span class="spec-label" data-i18n="lbl_port_lead">Port Lead</span>
               <span class="spec-value">AO Zero &amp; Bakka Sub</span>
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Folder</span>
+              <span class="spec-label" data-i18n="lbl_folder">Folder</span>
               <span class="spec-value mono" id="lblGameDirDisplay">CUSA17374</span>
               <button class="head-action" onclick="browseGameDir()" data-i18n="btn_change_short">Change</button>
             </div>
@@ -175,28 +175,28 @@
           <!-- Card 2: SHADER CACHE & ENGINE -->
           <div class="spec-card">
             <div class="spec-head">
-              <span class="spec-kicker">SHADER CACHE &amp; ENGINE</span>
+              <span class="spec-kicker" data-i18n="card_shaders">SHADER CACHE &amp; ENGINE</span>
               <button class="head-action red" onclick="clearShaderCache()" data-i18n="btn_clear_shader_short">Clear cache</button>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Shaders</span>
+              <span class="spec-label" data-i18n="lbl_shaders">Shaders</span>
               <span class="spec-value green" id="kvShaderSize">Ready · 0.0 MB cached</span>
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Render</span>
+              <span class="spec-label" data-i18n="lbl_render">Render</span>
               <span class="spec-value mono" id="kvRenderSummary">1080p · 60 FPS · Native</span>
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Controller</span>
+              <span class="spec-label" data-i18n="lbl_controller">Controller</span>
               <span class="spec-value" id="badgeGamepadText">Mouse &amp; Keyboard Active</span>
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Last run</span>
+              <span class="spec-label" data-i18n="lbl_last_run">Last run</span>
               <span class="spec-value" id="kvLastRunResult">Ready to launch</span>
-              <button class="head-action" onclick="openScreenshotsFolder()">Screenshots</button>
+              <button class="head-action" onclick="openScreenshotsFolder()" data-i18n="btn_screenshots_short">Screenshots</button>
             </div>
           </div>
 
@@ -205,11 +205,11 @@
             <div class="spec-head">
               <span class="spec-kicker" data-i18n="section_log">ENGINE LOG</span>
               <div style="display:flex;gap:12px;">
-                <button class="head-action" onclick="openLastRunLog()">Open log</button>
-                <button class="head-action red" onclick="clearLog()">Clear</button>
+                <button class="head-action" onclick="openLastRunLog()" data-i18n="btn_open_log_short">Open log</button>
+                <button class="head-action red" onclick="clearLog()" data-i18n="btn_clear_short">Clear</button>
               </div>
             </div>
-            <pre id="terminalLog" class="terminal-log-box">[INIT] Kamen Rider: Memory of Heroes PC Native v1.2.0 Ready.
+            <pre id="terminalLog" class="terminal-log-box">[INIT] Kamen Rider: Memory of Heroes PC Native v1.3.1 Ready.
 [VULKAN] Direct memory pool (2048MB DMEM / 1024MB FMEM) enabled.
 [SCHEDULER] Windows 1ms Precision Timer ready.</pre>
           </div>
@@ -217,11 +217,11 @@
           <!-- Card 4: QUICK OVERRIDES -->
           <div class="spec-card">
             <div class="spec-head">
-              <span class="spec-kicker">QUICK OVERRIDES</span>
+              <span class="spec-kicker" data-i18n="card_overrides">QUICK OVERRIDES</span>
               <span class="head-meta" data-i18n="lbl_autosaved">Auto-saved</span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Frame rate</span>
+              <span class="spec-label" data-i18n="lbl_frame_rate">Frame rate</span>
               <div class="seg-bar" id="segGroupFps">
                 <button class="seg-opt" data-val="30 FPS (Locked)" onclick="setQuickFps('30 FPS (Locked)')">30</button>
                 <button class="seg-opt active" data-val="60 FPS (Native Unlock)" onclick="setQuickFps('60 FPS (Native Unlock)')">60</button>
@@ -230,7 +230,7 @@
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Start in</span>
+              <span class="spec-label" data-i18n="lbl_start_in">Start in</span>
               <div class="seg-bar" id="segGroupDisplay">
                 <button class="seg-opt" data-val="window" onclick="setQuickDisplay('window')">Window</button>
                 <button class="seg-opt active" data-val="borderless" onclick="setQuickDisplay('borderless')">Borderless</button>
@@ -239,7 +239,7 @@
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">FPS overlay</span>
+              <span class="spec-label" data-i18n="lbl_fps_overlay">FPS overlay</span>
               <div class="seg-bar" id="segGroupHud">
                 <button class="seg-opt active" data-val="on" onclick="setQuickFpsHud(true)">On</button>
                 <button class="seg-opt" data-val="off" onclick="setQuickFpsHud(false)">Off</button>
@@ -247,7 +247,7 @@
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Subtitle ID</span>
+              <span class="spec-label" data-i18n="lbl_sub_id">Subtitle ID</span>
               <div class="seg-bar" id="segGroupSub">
                 <button class="seg-opt active" id="segSubOrig" onclick="triggerIndoPatch(false)">Original</button>
                 <button class="seg-opt" id="segSubIndo" onclick="triggerIndoPatch(true)">Bakka Sub</button>
@@ -267,7 +267,7 @@
           <span class="subpage-desc" data-i18n="dlc_desc">Built-in Indonesian subtitle patch and PS4 update (.pkg) installer</span>
         </div>
         <div class="gpu-pill">
-          <span>Target Game</span>
+          <span data-i18n="lbl_target_game">Target Game</span>
           <strong>CUSA17374</strong>
         </div>
       </div>
@@ -286,7 +286,7 @@
               </div>
               <div class="list-body" data-i18n="indo_patch_desc">Terjemahkan teks menu, tutorial, dan dialog cerita game ke Bahasa Indonesia gaya fansub Bakka Sub secara otomatis.</div>
               <div class="list-meta" id="indoPatchMeta">patches/id_patch.json · v1.0.0 · Target: CUSA17374/Media/sharedassets0.assets</div>
-              <div class="list-note">Backup file original otomatis disimpan di bin/user/vanilla_backup/ dan bisa dikembalikan kapan saja.</div>
+              <div class="list-note" data-i18n="indo_patch_note">Backup file original otomatis disimpan di bin/user/vanilla_backup/ dan bisa dikembalikan kapan saja.</div>
             </div>
           </div>
           <div class="list-right">
@@ -312,7 +312,7 @@
                 <span class="list-title" data-i18n="section_dlc">PS4 Update &amp; DLC Installer (.PKG)</span>
                 <span class="chip">ShadPs4Plus-PkgExtractor</span>
               </div>
-              <div class="list-body">Pasang file paket update v1.01 atau DLC PS4 (.pkg) secara otomatis ke dalam folder game CUSA17374.</div>
+              <div class="list-body" data-i18n="pkg_card_body">Pasang file paket update v1.01 atau DLC PS4 (.pkg) secara otomatis ke dalam folder game CUSA17374.</div>
               <div id="pkgListContainer" style="margin-top:10px;"></div>
             </div>
           </div>
@@ -328,7 +328,7 @@
       <div class="subpage-top">
         <div class="subpage-title-group">
           <span class="subpage-title" data-i18n="tab_controls">Controls</span>
-          <span class="subpage-desc">Gamepad &amp; Keyboard/Mouse button remapper</span>
+          <span class="subpage-desc" data-i18n="controls_desc">Gamepad &amp; Keyboard/Mouse button remapper</span>
         </div>
         <div class="seg-bar">
           <button class="seg-opt active" id="subTabBtnPad" onclick="switchControlsSub('gamepad')">Gamepad</button>
@@ -433,7 +433,7 @@
       <div class="subpage-top">
         <div class="subpage-title-group">
           <span class="subpage-title" data-i18n="section_achievements">PlayStation Trophies</span>
-          <span class="subpage-desc">50 authentic CUSA17374 achievements (Bilingual ID / EN)</span>
+          <span class="subpage-desc" data-i18n="trophies_desc">50 authentic CUSA17374 achievements (Bilingual ID / EN)</span>
         </div>
         <button class="btn-secondary" style="height:32px;" onclick="testPs4Toast()" data-i18n="btn_test_trophy">Test Notification</button>
       </div>
@@ -458,7 +458,7 @@
       <div class="subpage-top">
         <div class="subpage-title-group">
           <span class="subpage-title" data-i18n="tab_settings">Settings</span>
-          <span class="subpage-desc">Graphics, Upscaling, Audio, Diagnostics &amp; Credits</span>
+          <span class="subpage-desc" data-i18n="settings_desc">Graphics, Upscaling, Audio, System Specs, Diagnostics &amp; Credits</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <div class="gpu-pill" id="gpuDetectedPill"><span>GPU</span> <strong id="lblDetectedGpu">Detecting...</strong></div>
@@ -561,7 +561,7 @@
 
         <!-- Audio & Language -->
         <div class="section-card">
-          <div class="section-title"><span class="title-text">Audio &amp; Appearance</span></div>
+          <div class="section-title"><span class="title-text" data-i18n="lbl_audio_appearance">Audio &amp; Appearance</span></div>
           <div class="slider-row" style="margin-bottom:14px;">
             <label class="field-label" data-i18n="lbl_volume">Master Audio Volume:</label>
             <input type="range" id="rngVolume" min="0" max="100" value="100" class="custom-slider" oninput="onVolumeSlider(this.value)">
@@ -573,12 +573,53 @@
               <select id="selectLang" class="form-select" onchange="onLanguageSelect(this.value)">
                 <option value="id" selected>ID — Bahasa Indonesia</option>
                 <option value="en">EN — English</option>
+                <option value="es">ES — Español</option>
+                <option value="pt-BR">BR — Português (Brasil)</option>
+                <option value="pt-PT">PT — Português (Portugal)</option>
               </select>
             </div>
             <div class="form-field">
-              <label class="field-label">Updates Status:</label>
-              <div id="updateStatusText" style="font-size:12px;color:var(--green-text);padding-top:8px;">● v1.3.0-PC-Native (Latest)</div>
+              <label class="field-label" data-i18n="lbl_updates_status">Updates Status:</label>
+              <div id="updateStatusText" style="font-size:12px;color:var(--green-text);padding-top:8px;">● v1.3.1-PC-Native (Latest)</div>
             </div>
+          </div>
+        </div>
+
+        <!-- Full System Specs -->
+        <div class="spec-card" style="margin-bottom:14px;">
+          <div class="spec-head">
+            <span class="spec-kicker" data-i18n="card_specs">SYSTEM SPECS</span>
+            <button class="head-action" onclick="copySystemSpecs()" data-i18n="btn_copy_specs">Copy Specs</button>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label" data-i18n="lbl_cpu">Processor (CPU)</span>
+            <span class="spec-value mono" id="specCpu">Detecting...</span>
+            <span></span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label" data-i18n="lbl_gpu">Graphics (GPU)</span>
+            <span class="spec-value mono" id="specGpu">Detecting...</span>
+            <span></span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label" data-i18n="lbl_ram">Memory (RAM)</span>
+            <span class="spec-value mono" id="specRam">Detecting...</span>
+            <span></span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label" data-i18n="lbl_os">Operating System</span>
+            <span class="spec-value mono" id="specOs">Detecting...</span>
+            <span></span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label" data-i18n="lbl_disk">Disk Space</span>
+            <span class="spec-value mono" id="specDisk">Detecting...</span>
+            <span></span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label" data-i18n="lbl_recommended_preset">Recommended</span>
+            <span class="spec-value green" id="specRecommended">Detecting...</span>
+            <span></span>
           </div>
         </div>
 
@@ -616,7 +657,7 @@
               <div class="comm-avatar">XS</div>
               <div class="comm-name">XSEmu (zortos293)</div>
               <div class="comm-role">UI Design Inspiration (GPL-2.0)</div>
-              <p class="comm-desc">Inspirasi tata letak antarmuka desktop bersih, kartu detail game 2×2, dan kontrol segmented override.</p>
+              <p class="comm-desc" data-i18n="xsemu_desc">Inspirasi tata letak antarmuka desktop bersih, kartu detail game 2×2, dan kontrol segmented override.</p>
               <div class="comm-link">github.com/zortos293/xsemu</div>
             </div>
           </div>
@@ -655,6 +696,7 @@
 
   <div id="appToast" class="app-toast"></div>
   <audio id="trophyChime" src="assets/custom_trophy/trophy.wav" preload="auto"></audio>
+  <script src="i18n.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

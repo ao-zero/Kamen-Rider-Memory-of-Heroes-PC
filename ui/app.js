@@ -5,235 +5,8 @@
    Port Lead: AO Zero | Partner: Bakka Sub (www.bakkasub.my.id)
    ========================================================================== */
 
-// Bilingual Translation Dictionary
-const I18N = {
-  id: {
-    menu_header: "MAIN MENU",
-    tab_play: "Overview",
-    tab_settings: "Pengaturan",
-    tab_controls: "Kontrol",
-    tab_gamepad: "Kontrol Stik",
-    tab_keyboard: "Keyboard & Mouse",
-    tab_saves: "Saves",
-    tab_pkg: "Patch & DLC",
-    tab_achievements: "Trophy",
-    tab_tools: "Alat & Update",
-    tab_community: "Komunitas",
-    card_game: "GAME",
-    btn_verify_short: "Verifikasi",
-    btn_change_short: "Ubah",
-    btn_clear_shader_short: "Hapus cache",
-    lbl_autosaved: "Tersimpan otomatis",
-    btn_import_save: "Impor Save (.zip)...",
-    chk_auto_backup: "Auto-backup save sebelum main (simpan 5 terakhir)",
-    system_ready: "Sistem Siap 60 FPS",
-    port_lead: "Port Lead:",
-    partner: "Partner:",
-    section_game: "Informasi Game",
-    profile: "Profil:",
-    mode: "Mode:",
-    lbl_sub_short: "Sub:",
-    section_indo_patch: "Patch Bahasa Indonesia (Built-in Subtitle)",
-    indo_patch_desc: "Terjemahkan teks menu, tutorial, dan dialog cerita game ke Bahasa Indonesia gaya fansub Bakka Sub secara otomatis. File asli game otomatis di-backup dan bisa dikembalikan kapan saja.",
-    opt_sub_orig: "Original (English / Japanese)",
-    opt_sub_indo: "Bahasa Indonesia (Bakka Sub x AO Zero Built-in)",
-    btn_apply_patch: "Terapkan",
-    lbl_patch_info: "Info Patch:",
-    btn_change_folder: "Change game folder...",
-    btn_play: "PLAY GAME",
-    btn_create_shortcut: "Create Desktop Shortcut",
-    btn_open_game_folder: "Buka Folder Game",
-    btn_open_saves: "Buka Folder Save",
-    section_log: "Log & Status Engine",
-    section_presets: "1-Click Optimization Presets",
-    section_perf: "Performance",
-    lbl_fps: "Target Frame Rate (FPS Limit):",
-    lbl_vsync: "VSync & Presentation:",
-    chk_async_shaders: "Compile shaders in the background (Fast Math & Async Pipelines)",
-    chk_show_fps: "FPS counter in the corner",
-    chk_show_hud: "Performance & Frame Time HUD in the corner",
-    section_display: "Display & Resolution",
-    lbl_res: "Internal Resolution / Render Scale:",
-    lbl_aspect: "Aspect Ratio:",
-    lbl_upscaler: "Upscaling Engine:",
-    lbl_upscaler_qual: "Upscaler Quality:",
-    chk_fullscreen: "Fullscreen",
-    chk_borderless: "Borderless window (Seamless Alt-Tab)",
-    chk_hide_launcher: "Sembunyikan launcher saat game berjalan",
-    section_sound: "Sound & Audio",
-    lbl_volume: "Master Audio Volume:",
-    section_pad_mapping: "Gamepad Button Mapping",
-    pad_desc: "Mendukung Xbox, PlayStation (DualShock / DualSense), Switch Pro, dan Controller Universal. Klik 'Ubah' untuk memetakan tombol.",
-    lbl_deadzone: "Analog Stick Deadzone:",
-    th_action: "Aksi Game",
-    th_assigned: "Tombol Stik",
-    th_remap: "Atur",
-    btn_remap: "Ubah",
-    btn_restore_pad: "Kembalikan Default Controller",
-    section_kbm_mapping: "Keyboard & Mouse Controls",
-    mouse_sync_title: "Zero-Touch Mouse Aim Aktif Otomatis!",
-    mouse_sync_desc: "Kamera mouse langsung sinkron secara otomatis saat game dijalankan. Tidak perlu menekan tombol F7 secara manual. Kursor mouse akan terkunci di dalam game.",
-    lbl_mouse_sens: "Sensitivitas Kamera Mouse (Look Sensitivity):",
-    btn_restore_kbm: "Kembalikan Default Keyboard & Mouse",
-    section_saves: "Custom Savegame Manager",
-    saves_desc: "Kelola slot penyimpanan game, backup data simpanan, pasang preset save 100% tamat, atau pulihkan backup sebelumnya.",
-    btn_backup_saves: "Backup Semua Save",
-    btn_load_100: "Pasang Save 100% Tamat",
-    btn_open_saves_folder: "Buka Folder Savegame",
-    btn_refresh: "Segarkan",
-    hdr_detected_saves: "Slot Save Terdeteksi (CUSA17374):",
-    hdr_restore_backup: "Pulihkan Backup Tersimpan:",
-    opt_no_backups: "Belum ada file backup tersimpan...",
-    btn_restore: "Pulihkan Backup",
-    section_dlc: "DLC & Update Installer",
-    dlc_desc: "Pasang file paket update v1.01 atau DLC PS4 (.pkg) secara otomatis ke dalam folder game.",
-    hdr_pkgs_found: "File .PKG Terdeteksi di Folder:",
-    btn_browse_pkg: "Pilih File PKG Manual...",
-    section_achievements: "Prestasi & Trophy PlayStation",
-    filter_all: "Semua (50)",
-    filter_unlocked: "Terbuka",
-    filter_locked: "Terkunci",
-    btn_test_trophy: "Tes Notifikasi",
-    section_updates: "Updates & Versi",
-    installed_ver: "Versi Terpasang: v1.1.0-PC-Native",
-    btn_check_updates: "Check for Updates",
-    chk_update_startup: "Check for updates when the launcher opens",
-    section_installation: "Pengaturan & Migrasi Instalasi",
-    btn_import_settings: "Bring settings from another installation...",
-    btn_reset_settings: "Reset Semua Pengaturan ke Default Pabrik",
-    section_folders: "Folders and Log",
-    btn_open_log: "Open last run log",
-    btn_open_port: "Open the port folder",
-    btn_open_game: "Open the game folder",
-    chk_detailed_log: "Save a detailed log (with frame statistics)",
-    section_diagnostics: "Diagnosa Hardware & Integritas Game",
-    btn_run_gpu_diag: "Cek Kemampuan GPU & Driver Vulkan",
-    btn_verify_files: "Verifikasi Integritas File Game (eboot.bin)",
-    btn_clean_temp: "Bersihkan File Sementara & Crash Dump",
-    section_desktop: "Desktop Shortcut",
-    section_shader: "Shader Cache",
-    shader_desc: "Shader disimpan agar sesi berikutnya berjalan mulus. Hapus cache jika Anda baru saja update driver GPU atau mengalami glitch grafis.",
-    btn_clear_shader: "Clear the shader cache",
-    section_lang: "Launcher Language",
-    section_community: "Komunitas & Pengembang",
-    lead_desc: "Pengembang utama Native PC Port Launcher, optimasi Vulkan 1.3 60 FPS, Auto-Sync Mouse Look, dan Remapper Input.",
-    partner_desc: "Penyedia takarir (fansub) Tokusatsu Indonesia terdepan. Kunjungi www.bakkasub.my.id untuk update Kamen Rider terbaru!",
-    modal_hint: "Klik tombol yang diinginkan pada stik controller Anda di bawah ini:"
-  },
-  en: {
-    menu_header: "MAIN MENU",
-    tab_play: "Overview",
-    tab_settings: "Settings",
-    tab_controls: "Controls",
-    tab_gamepad: "Gamepad",
-    tab_keyboard: "Keyboard",
-    tab_saves: "Saves",
-    tab_pkg: "Patch & DLC",
-    tab_achievements: "Trophies",
-    tab_tools: "Tools",
-    tab_community: "Community",
-    card_game: "GAME",
-    btn_verify_short: "Verify",
-    btn_change_short: "Change",
-    btn_clear_shader_short: "Clear cache",
-    lbl_autosaved: "Auto-saved",
-    btn_import_save: "Import Save (.zip)...",
-    chk_auto_backup: "Auto-backup saves before launching game (keeps last 5)",
-    system_ready: "System Ready (60 FPS)",
-    port_lead: "Port Lead:",
-    partner: "Partner:",
-    section_game: "Game Information",
-    profile: "Profile:",
-    mode: "Mode:",
-    lbl_sub_short: "Sub:",
-    section_indo_patch: "Indonesian Subtitle Patch (Built-in)",
-    indo_patch_desc: "Translate menus, tutorials, and story dialogue into natural Bakka Sub-style Indonesian automatically. Original game files are backed up safely and can be restored anytime.",
-    opt_sub_orig: "Original (English / Japanese)",
-    opt_sub_indo: "Bahasa Indonesia (Bakka Sub x AO Zero Built-in)",
-    btn_apply_patch: "Apply",
-    lbl_patch_info: "Patch Info:",
-    btn_change_folder: "Change game folder...",
-    btn_play: "PLAY GAME",
-    btn_create_shortcut: "Create Desktop Shortcut",
-    btn_open_game_folder: "Open Game Folder",
-    btn_open_saves: "Open Saves Folder",
-    section_log: "Engine Log & Status",
-    section_presets: "1-Click Optimization Presets",
-    section_perf: "Performance",
-    lbl_fps: "Target Frame Rate (FPS Limit):",
-    lbl_vsync: "VSync & Presentation:",
-    chk_async_shaders: "Compile shaders in the background (Fast Math & Async Pipelines)",
-    chk_show_fps: "FPS counter in the corner",
-    chk_show_hud: "Performance & Frame Time HUD in the corner",
-    section_display: "Display & Resolution",
-    lbl_res: "Internal Resolution / Render Scale:",
-    lbl_aspect: "Aspect Ratio:",
-    lbl_upscaler: "Upscaling Engine:",
-    lbl_upscaler_qual: "Upscaler Quality:",
-    chk_fullscreen: "Fullscreen",
-    chk_borderless: "Borderless window (Seamless Alt-Tab)",
-    chk_hide_launcher: "Hide launcher during gameplay",
-    section_sound: "Sound & Audio",
-    lbl_volume: "Master Audio Volume:",
-    section_pad_mapping: "Gamepad Button Mapping",
-    pad_desc: "Supports Xbox, PlayStation (DualShock / DualSense), Switch Pro, and generic controllers. Press 'Change' to map buttons.",
-    lbl_deadzone: "Analog Stick Deadzone:",
-    th_action: "Game Action",
-    th_assigned: "Controller Button",
-    th_remap: "Remap",
-    btn_remap: "Change",
-    btn_restore_pad: "Restore Controller Defaults",
-    section_kbm_mapping: "Keyboard & Mouse Controls",
-    mouse_sync_title: "Zero-Touch Mouse Aim Auto-Engaged!",
-    mouse_sync_desc: "Mouse camera aim synchronizes automatically upon boot. No manual F7 press required. Cursor locks seamlessly inside the game.",
-    lbl_mouse_sens: "Mouse Camera Look Sensitivity:",
-    btn_restore_kbm: "Restore Keyboard & Mouse Defaults",
-    section_saves: "Custom Savegame Manager",
-    saves_desc: "Manage game save slots, backup save files, apply 100% completed save presets, or restore prior backups.",
-    btn_backup_saves: "Backup All Saves",
-    btn_load_100: "Load 100% Complete Save Preset",
-    btn_open_saves_folder: "Open Saves Folder",
-    btn_refresh: "Refresh",
-    hdr_detected_saves: "Detected Save Slots (CUSA17374):",
-    hdr_restore_backup: "Restore Existing Backup:",
-    opt_no_backups: "No backup archives found...",
-    btn_restore: "Restore Backup",
-    section_dlc: "DLC & Update Installer",
-    dlc_desc: "Install v1.01 update or PS4 DLC package (.pkg) files directly into your game directory.",
-    hdr_pkgs_found: "Detected .PKG Files in Root:",
-    btn_browse_pkg: "Browse Manual PKG...",
-    section_achievements: "PlayStation Trophies & Achievements",
-    filter_all: "All (50)",
-    filter_unlocked: "Unlocked",
-    filter_locked: "Locked",
-    btn_test_trophy: "Test Notification",
-    section_updates: "Updates & Version",
-    installed_ver: "Installed Version: v1.1.0-PC-Native",
-    btn_check_updates: "Check for Updates",
-    chk_update_startup: "Check for updates when the launcher opens",
-    section_installation: "Settings & Installation Migration",
-    btn_import_settings: "Bring settings from another installation...",
-    btn_reset_settings: "Reset All Settings to Factory Default",
-    section_folders: "Folders and Log",
-    btn_open_log: "Open last run log",
-    btn_open_port: "Open the port folder",
-    btn_open_game: "Open the game folder",
-    chk_detailed_log: "Save a detailed log (with frame statistics)",
-    section_diagnostics: "Hardware Diagnostics & File Integrity",
-    btn_run_gpu_diag: "Check GPU & Vulkan Driver Capabilities",
-    btn_verify_files: "Verify Game File Integrity (eboot.bin)",
-    btn_clean_temp: "Clean Temporary Files & Crash Traces",
-    section_desktop: "Desktop Shortcut",
-    section_shader: "Shader Cache",
-    shader_desc: "Shaders are preserved for smooth future sessions. Clear shader cache only after GPU driver updates or graphic glitches.",
-    btn_clear_shader: "Clear the shader cache",
-    section_lang: "Launcher Language",
-    section_community: "Community & Credits",
-    lead_desc: "Lead developer of the Native PC Port Launcher, Vulkan 1.3 60 FPS optimizer, Zero-Touch Mouse Aim, and Input Remapper.",
-    partner_desc: "Leading Indonesian Tokusatsu fansub provider. Visit www.bakkasub.my.id for the latest Kamen Rider subtitle releases!",
-    modal_hint: "Click the desired gamepad button from the options below:"
-  }
-};
+// Localization dictionary (window.I18N, window.ACTION_LABELS, window.SUPPORTED_LANGS) is loaded from ui/i18n.js
+const I18N = window.I18N || {};
 
 let currentLang = 'id';
 let currentTheme = 'dark';
@@ -241,6 +14,8 @@ let indoPatchEnabled = false;
 let indoPatchBusy = false;
 let cachedKeybinds = {};
 let cachedTrophies = [];
+let cachedHardware = null;
+let cachedPkgs = [];
 let activeTrophyFilter = 'all';
 let currentMappingAction = null;
 let initStarted = false;
@@ -438,11 +213,12 @@ window.onIndoPatchDone = function(res) {
 };
 
 // ==========================================================================
-// LANGUAGE SWITCHER
+// LANGUAGE SWITCHER (5 LANGUAGES: ID / EN / ES / PT-BR / PT-PT)
 // ==========================================================================
 function applyLanguage(lang, persist) {
-  currentLang = lang;
-  const dict = I18N[lang] || I18N.id;
+  const supported = window.SUPPORTED_LANGS || ['id', 'en', 'es', 'pt-BR', 'pt-PT'];
+  currentLang = supported.includes(lang) ? lang : 'en';
+  const dict = I18N[currentLang] || I18N.en || {};
 
   // Update elements with data-i18n
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -453,21 +229,21 @@ function applyLanguage(lang, persist) {
   });
 
   const label = document.getElementById('langLabel');
-  if (label) label.textContent = lang === 'id' ? 'ID' : 'EN';
+  if (label) {
+    label.textContent = (window.LANG_SHORT && window.LANG_SHORT[currentLang]) || currentLang.toUpperCase();
+  }
 
   const select = document.getElementById('selectLang');
-  if (select) select.value = lang;
+  if (select) select.value = currentLang;
 
-  // Re-render keybind tables so button labels ('Ubah' / 'Change') update dynamically
+  // Re-render dynamic tables/lists so button labels & notices update immediately
   if (cachedKeybinds && Object.keys(cachedKeybinds).length > 0) {
     renderKeybindTables(cachedKeybinds);
   }
-
-  // Re-render trophies to update localized descriptions
   renderTrophies(cachedTrophies, activeTrophyFilter);
+  renderPkgList(cachedPkgs);
 
   if (persist) {
-    // Persist language setting (skipped during initial load to avoid clobbering)
     onSettingChanged();
   }
 }
@@ -477,7 +253,10 @@ function setLanguage(lang) {
 }
 
 function toggleLanguage() {
-  setLanguage(currentLang === 'id' ? 'en' : 'id');
+  const supported = window.SUPPORTED_LANGS || ['id', 'en', 'es', 'pt-BR', 'pt-PT'];
+  const idx = supported.indexOf(currentLang);
+  const next = supported[(idx + 1) % supported.length];
+  setLanguage(next);
 }
 
 function onLanguageSelect(val) {
@@ -571,10 +350,53 @@ function renderSessionStats(stats) {
 }
 
 function renderHardwareSummary(hw) {
+  if (!hw) return;
+  cachedHardware = hw;
+
   const el = document.getElementById('lblDetectedGpu');
-  if (!el || !hw) return;
-  const ram = hw.ram_gb ? ` · ${hw.ram_gb} GB RAM` : '';
-  el.textContent = `${hw.gpu || 'Vulkan 1.3 GPU'}${ram}`;
+  if (el) {
+    const ram = hw.ram_gb ? ` · ${hw.ram_gb} GB RAM` : '';
+    el.textContent = `${hw.gpu || 'Vulkan 1.3 GPU'}${ram}`;
+  }
+
+  const vramStr = hw.vram_gb ? ` (${hw.vram_gb} GB VRAM)` : '';
+  const setTxt = (id, val) => {
+    const node = document.getElementById(id);
+    if (node) node.textContent = val || '—';
+  };
+  setTxt('specCpu', hw.cpu || 'Unknown CPU');
+  setTxt('specGpu', `${hw.gpu || 'Vulkan 1.3 GPU'}${vramStr}`);
+  setTxt('specRam', hw.ram_gb ? `${hw.ram_gb} GB` : 'Unknown');
+  setTxt('specOs', hw.os || 'Windows');
+  setTxt('specDisk', hw.disk_free || 'Unknown');
+  setTxt('specRecommended', hw.recommended || 'Balanced (1080p FSR 3.1)');
+}
+
+function copySystemSpecs() {
+  const hw = cachedHardware || {};
+  const vramStr = hw.vram_gb ? ` (${hw.vram_gb} GB VRAM)` : '';
+  const text = [
+    '=== Kamen Rider: Memory of Heroes PC Native v1.3.1 — System Specs ===',
+    `CPU: ${hw.cpu || 'Unknown'}`,
+    `GPU: ${hw.gpu || 'Unknown'}${vramStr}`,
+    `RAM: ${hw.ram_gb ? hw.ram_gb + ' GB' : 'Unknown'}`,
+    `OS:  ${hw.os || 'Windows'}`,
+    `Disk: ${hw.disk_free || 'Unknown'}`,
+    `Recommended Preset: ${hw.recommended || 'Balanced'}`
+  ].join('\n');
+
+  const okMsg = (I18N[currentLang] && I18N[currentLang].msg_specs_copied) || 'System specs copied to clipboard!';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast(okMsg, 'ok')).catch(() => showToast(okMsg, 'ok'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    showToast(okMsg, 'ok');
+  }
 }
 
 function renderShaderCache(mb) {
@@ -969,7 +791,7 @@ function renderTrophies(trophies, filter) {
       </div>
       <div class="trophy-card-right">
         <div class="trophy-badge-pill ${t.type}">${t.type} • ${t.points} PTS</div>
-        <button class="btn-trophy-test" onclick="previewTrophyPopup(${t.id})" title="Test Achievement Notification Popup">${currentLang === 'id' ? 'Tes Notif' : 'Test'}</button>
+        <button class="btn-trophy-test" onclick="previewTrophyPopup(${t.id})" title="Test Achievement Notification Popup">${(I18N[currentLang] && I18N[currentLang].btn_test_sm) || 'Test'}</button>
       </div>
     `;
     container.appendChild(card);
@@ -1212,48 +1034,10 @@ function openExternal(url) {
 // ==========================================================================
 // REMAPPING ENGINE (KEYBOARD & GAMEPAD)
 // ==========================================================================
-const ACTION_LABELS = {
-  id: {
-    cross: "✕ Lompat / Konfirmasi",
-    circle: "○ Menghindar / Batal",
-    square: "□ Serangan Ringan (Light)",
-    triangle: "△ Serangan Berat (Heavy)",
-    l1: "L1 Bertahan / Kunci Target",
-    r1: "R1 Kuda-kuda Rider Power",
-    l2: "L2 Pemilihan Ganti Form",
-    r2: "R2 Jurus Pamungkas (Finisher)",
-    l3: "L3 Lari Cepat (Sprint)",
-    r3: "R3 Reset Sudut Kamera",
-    options: "Options / Jeda Menu",
-    touchpad: "Touchpad / Peta",
-    left_stick_up: "Gerak Maju",
-    left_stick_down: "Gerak Mundur",
-    left_stick_left: "Gerak Kiri",
-    left_stick_right: "Gerak Kanan"
-  },
-  en: {
-    cross: "✕ Jump / Confirm",
-    circle: "○ Dodge / Form Cancel",
-    square: "□ Light Attack",
-    triangle: "△ Heavy Attack",
-    l1: "L1 Guard / Target Lock-On",
-    r1: "R1 Rider Power Stance",
-    l2: "L2 Form Change Selection",
-    r2: "R2 Special Finish Skill",
-    l3: "L3 Sprint / Left Stick Click",
-    r3: "R3 Reset Camera / Right Stick Click",
-    options: "Options / Pause Menu",
-    touchpad: "Touchpad / Map",
-    left_stick_up: "Move Forward",
-    left_stick_down: "Move Backward",
-    left_stick_left: "Move Left",
-    left_stick_right: "Move Right"
-  }
-};
-
 function getActionLabel(act) {
-  const dict = ACTION_LABELS[currentLang] || ACTION_LABELS.en;
-  return dict[act] || ACTION_LABELS.en[act] || act;
+  const labels = window.ACTION_LABELS || {};
+  const dict = labels[currentLang] || labels.en || {};
+  return dict[act] || (labels.en && labels.en[act]) || act;
 }
 
 function loadKeybinds() {
@@ -1273,7 +1057,7 @@ function renderKeybindTables(binds) {
   padTable.innerHTML = '';
   kbmTable.innerHTML = '';
 
-  const remapBtnText = currentLang === 'id' ? 'Ubah' : 'Change';
+  const remapBtnText = (I18N[currentLang] && I18N[currentLang].btn_remap) || 'Change';
 
   const padActions = ['cross', 'circle', 'square', 'triangle', 'l1', 'r1', 'l2', 'r2', 'l3', 'r3', 'options', 'touchpad'];
   const kbmActions = ['left_stick_up', 'left_stick_down', 'left_stick_left', 'left_stick_right', 'square', 'triangle', 'cross', 'circle', 'r1', 'l1', 'r2', 'l2', 'options', 'touchpad'];
@@ -1434,7 +1218,7 @@ function selectPadButton(btnId) {
 function startKbmListen(actionKey, btn) {
   btn = btn || (typeof event !== 'undefined' && event ? event.target : null) || document.activeElement;
   if (btn) {
-    btn.textContent = currentLang === 'id' ? "Tekan Tombol / Klik..." : "Press Key / Click...";
+    btn.textContent = (I18N[currentLang] && I18N[currentLang].lbl_press_key) || "Press Key / Click...";
     btn.style.background = "var(--accent)";
     btn.style.color = "#0D1510";
   }
@@ -1500,16 +1284,18 @@ function startKbmListen(actionKey, btn) {
 // PKG INSTALLATION
 // ==========================================================================
 function renderPkgList(pkgs) {
+  cachedPkgs = pkgs || [];
   const container = document.getElementById('pkgListContainer');
   if (!container) return;
   container.innerHTML = '';
 
-  if (pkgs.length === 0) {
-    container.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); padding: 8px 0;">Tidak ada file .pkg di folder root. Gunakan tombol 'Pilih File PKG Manual' di bawah.</div>`;
+  if (cachedPkgs.length === 0) {
+    const emptyMsg = (I18N[currentLang] && I18N[currentLang].msg_no_pkg_found) || "No .pkg files found in root folder. Click 'Browse .PKG...' on the right to install manually.";
+    container.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); padding: 8px 0;">${emptyMsg}</div>`;
     return;
   }
 
-  pkgs.forEach(pkg => {
+  cachedPkgs.forEach(pkg => {
     const item = document.createElement('div');
     item.className = 'pkg-item';
     item.style.cssText = "display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border-subtle);";

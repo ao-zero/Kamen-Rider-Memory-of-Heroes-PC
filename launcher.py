@@ -67,7 +67,7 @@ import session_tracker
 import ctypes
 import urllib.request
 
-CURRENT_VERSION = "v1.3.0-PC-Native"
+CURRENT_VERSION = "v1.3.1-PC-Native"
 _HW_CACHE = None
 
 
@@ -75,8 +75,22 @@ def _detect_hardware_summary() -> dict:
     global _HW_CACHE
     if _HW_CACHE is not None:
         return _HW_CACHE
+    import platform
     gpu_name = "Vulkan 1.3 GPU"
+    gpu_vram_gb = 0.0
+    cpu_name = platform.processor() or "x86-64 CPU"
+    cpu_cores = os.cpu_count() or 0
     ram_gb = 0
+    os_name = f"Windows {platform.release()} ({platform.machine()})"
+    disk_free_gb = 0.0
+    disk_drive = str(BASE_DIR.drive or "C:")
+
+    try:
+        usage = shutil.disk_usage(BASE_DIR)
+        disk_free_gb = round(usage.free / (1024 ** 3), 1)
+    except Exception:
+        pass
+
     if sys.platform == "win32":
         try:
             class MEMORYSTATUSEX(ctypes.Structure):
@@ -99,20 +113,53 @@ def _detect_hardware_summary() -> dict:
             pass
         try:
             flags = 0x08000000
-            r = subprocess.run(
-                ["powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join ' | '"],
-                capture_output=True, text=True, timeout=4, creationflags=flags
+            ps_cmd = (
+                "$cpu = (Get-CimInstance Win32_Processor | Select-Object -First 1 -ExpandProperty Name); "
+                "$gpus = @(Get-CimInstance Win32_VideoController | ForEach-Object { @{ n=$_.Name; r=$_.AdapterRAM } }); "
+                "$os = (Get-CimInstance Win32_OperatingSystem | Select-Object -First 1 -ExpandProperty Caption); "
+                "@{ cpu=$cpu; gpus=$gpus; os=$os } | ConvertTo-Json -Compress"
             )
-            names = [n.strip() for n in (r.stdout or "").split("|") if n.strip()]
-            # Prefer discrete GPU (NVIDIA/AMD) over integrated Intel if both present
-            discrete = [n for n in names if any(k in n.upper() for k in ("NVIDIA", "RTX", "GTX", "RADEON", "RX "))]
-            if discrete:
-                gpu_name = discrete[0]
-            elif names:
-                gpu_name = names[0]
+            r = subprocess.run(
+                ["powershell", "-NoProfile", "-Command", ps_cmd],
+                capture_output=True, text=True, timeout=5, creationflags=flags
+            )
+            if r.stdout and r.stdout.strip():
+                info = json.loads(r.stdout.strip())
+                if info.get("cpu"):
+                    cpu_name = str(info["cpu"]).strip()
+                if info.get("os"):
+                    os_name = str(info["os"]).replace("Microsoft ", "").strip()
+                gpus = info.get("gpus") or []
+                if isinstance(gpus, dict):
+                    gpus = [gpus]
+                discrete = [g for g in gpus if any(k in str(g.get("n", "")).upper() for k in ("NVIDIA", "RTX", "GTX", "RADEON", "RX "))]
+                chosen = discrete[0] if discrete else (gpus[0] if gpus else None)
+                if chosen and chosen.get("n"):
+                    gpu_name = str(chosen["n"]).strip()
+                    raw_ram = chosen.get("r") or 0
+                    if raw_ram > 0:
+                        gpu_vram_gb = round(raw_ram / (1024 ** 3), 1)
         except Exception:
             pass
-    _HW_CACHE = {"gpu": gpu_name, "ram_gb": ram_gb}
+
+    # Smart preset suggestion based on detected GPU & RAM
+    gpu_up = gpu_name.upper()
+    if any(k in gpu_up for k in ("RTX", "RX 6", "RX 7", "RX 9")) and ram_gb >= 16:
+        recommended = "Native Ultra Fidelity (1080p/1440p · 60 FPS)"
+    elif any(k in gpu_up for k in ("GTX", "RADEON", "RX ")) and ram_gb >= 8:
+        recommended = "Balanced (1080p · AMD FSR 3.1 Quality · 60 FPS)"
+    else:
+        recommended = "Potato PC (720p · AMD FSR Performance · 60 FPS)"
+
+    _HW_CACHE = {
+        "cpu": f"{cpu_name} ({cpu_cores}T)" if cpu_cores else cpu_name,
+        "gpu": gpu_name,
+        "vram_gb": gpu_vram_gb,
+        "ram_gb": ram_gb,
+        "os": os_name,
+        "disk_free": f"{disk_free_gb} GB free on {disk_drive}",
+        "recommended": recommended,
+    }
     return _HW_CACHE
 
 
