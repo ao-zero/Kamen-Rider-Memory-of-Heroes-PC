@@ -75,13 +75,15 @@ function syncOverviewSummary() {
   });
   const isFs = document.getElementById('chkFullscreen')?.checked;
   const isBl = document.getElementById('chkBorderless')?.checked;
-  const dispMode = isFs ? 'fullscreen' : (isBl ? 'borderless' : 'window');
+  const dispMode = isFs ? 'fullscreen' : (isBl ? 'borderless' : 'windowed');
   document.querySelectorAll('#segGroupDisplay .seg-opt').forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-val') === dispMode);
   });
   const showFps = document.getElementById('chkShowFps')?.checked;
+  const showHud = document.getElementById('chkShowPerfHud')?.checked;
+  const ovMode = showHud ? 'detailed' : (showFps ? 'fps' : 'off');
   document.querySelectorAll('#segGroupHud .seg-opt').forEach(b => {
-    b.classList.toggle('active', b.getAttribute('data-val') === (showFps ? 'on' : 'off'));
+    b.classList.toggle('active', b.getAttribute('data-val') === ovMode);
   });
 }
 
@@ -101,9 +103,35 @@ function setQuickDisplay(mode) {
   onSettingChanged();
 }
 
-function setQuickFpsHud(on) {
-  const chk = document.getElementById('chkShowFps');
-  if (chk) chk.checked = !!on;
+function onDisplayCheckboxChanged(which) {
+  const fs = document.getElementById('chkFullscreen');
+  const bl = document.getElementById('chkBorderless');
+  if (which === 'fullscreen' && fs && fs.checked && bl) {
+    bl.checked = false;
+  } else if (which === 'borderless' && bl && bl.checked && fs) {
+    fs.checked = false;
+  }
+  syncOverviewSummary();
+  onSettingChanged();
+}
+
+function setQuickFpsOverlay(mode) {
+  const chkFps = document.getElementById('chkShowFps');
+  const chkHud = document.getElementById('chkShowPerfHud');
+  if (chkFps) chkFps.checked = (mode !== 'off');
+  if (chkHud) chkHud.checked = (mode === 'detailed');
+  syncOverviewSummary();
+  onSettingChanged();
+}
+
+function onFpsCheckboxChanged(which) {
+  const chkFps = document.getElementById('chkShowFps');
+  const chkHud = document.getElementById('chkShowPerfHud');
+  if (which === 'detailed' && chkHud && chkHud.checked && chkFps) {
+    chkFps.checked = true;
+  } else if (which === 'fps' && chkFps && !chkFps.checked && chkHud) {
+    chkHud.checked = false;
+  }
   syncOverviewSummary();
   onSettingChanged();
 }
@@ -376,7 +404,7 @@ function copySystemSpecs() {
   const hw = cachedHardware || {};
   const vramStr = hw.vram_gb ? ` (${hw.vram_gb} GB VRAM)` : '';
   const text = [
-    '=== Kamen Rider: Memory of Heroes PC Native v1.3.1 — System Specs ===',
+    '=== Kamen Rider: Memory of Heroes PC Native v1.3.2 — System Specs ===',
     `CPU: ${hw.cpu || 'Unknown'}`,
     `GPU: ${hw.gpu || 'Unknown'}${vramStr}`,
     `RAM: ${hw.ram_gb ? hw.ram_gb + ' GB' : 'Unknown'}`,
@@ -396,6 +424,26 @@ function copySystemSpecs() {
     try { document.execCommand('copy'); } catch (e) {}
     document.body.removeChild(ta);
     showToast(okMsg, 'ok');
+  }
+}
+
+function applyRecommendedPreset() {
+  const preset = (cachedHardware && cachedHardware.recommended_preset) || 'balanced';
+  applyPreset(preset);
+  const okMsg = (I18N[currentLang] && I18N[currentLang].msg_preset_applied) || 'Recommended preset applied!';
+  showToast(okMsg, 'ok');
+}
+
+function exportDiagnosticBundle() {
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.export_diagnostic_bundle().then(res => {
+      if (res && res.message && res.message !== 'Cancelled.') {
+        showToast(res.message, res.success ? 'ok' : 'error');
+        appendLog(`[DIAGNOSTIC] ${res.message}`);
+      }
+    }).catch(err => {
+      showToast('Diagnostic Export Error: ' + err, 'error');
+    });
   }
 }
 
@@ -447,15 +495,19 @@ function initLauncher(forceReload = false) {
       document.getElementById('selectAspect').value = data.aspect_ratio || '16:9';
       document.getElementById('selectVsync').value = data.vsync_mode || 'Mailbox (Fastest / Unlocked)';
       
-      document.getElementById('chkFullscreen').checked = (data.fullscreen === 'true' || data.fullscreen === true);
-      document.getElementById('chkBorderless').checked = (data.borderless === 'true' || data.borderless === true || data.borderless === undefined);
-      document.getElementById('chkShowFps').checked = (data.show_fps === 'true' || data.show_fps === true);
-      document.getElementById('chkShowPerfHud').checked = (data.show_perf_hud === 'true' || data.show_perf_hud === true);
+      const dm = data.display_mode || ((data.fullscreen === 'true' || data.fullscreen === true) ? 'fullscreen' : ((data.borderless === 'true' || data.borderless === true || data.borderless === undefined) ? 'borderless' : 'windowed'));
+      document.getElementById('chkFullscreen').checked = (dm === 'fullscreen');
+      document.getElementById('chkBorderless').checked = (dm === 'borderless');
+      const om = data.fps_overlay_mode || ((data.show_perf_hud === 'true' || data.show_perf_hud === true) ? 'detailed' : ((data.show_fps === 'true' || data.show_fps === true) ? 'fps' : 'off'));
+      document.getElementById('chkShowFps').checked = (om !== 'off');
+      document.getElementById('chkShowPerfHud').checked = (om === 'detailed');
       document.getElementById('chkCompileShaders').checked = (data.compile_shaders_bg === 'true' || data.compile_shaders_bg === true || data.compile_shaders_bg === undefined);
       document.getElementById('chkHideLauncher').checked = (data.hide_launcher_on_play === 'true' || data.hide_launcher_on_play === true);
       const chkAB = document.getElementById('chkAutoBackup');
       if (chkAB) chkAB.checked = (data.auto_backup_saves === 'true' || data.auto_backup_saves === true || data.auto_backup_saves === undefined);
       document.getElementById('chkUpdateStartup').checked = (data.check_updates_startup === 'true' || data.check_updates_startup === true || data.check_updates_startup === undefined);
+      const chkRpc = document.getElementById('chkDiscordRpc');
+      if (chkRpc) chkRpc.checked = (data.discord_rpc === 'true' || data.discord_rpc === true || data.discord_rpc === undefined);
       
       const vol = data.audio_volume || '100';
       document.getElementById('rngVolume').value = vol;
@@ -511,6 +563,12 @@ window.addEventListener('DOMContentLoaded', initLauncher);
 function onSettingChanged() {
   if (!window.pywebview || !window.pywebview.api) return;
   if (!initDone) return; // do not persist default/pre-init control values
+  const isFs = document.getElementById('chkFullscreen').checked;
+  const isBl = document.getElementById('chkBorderless').checked;
+  const dispMode = isFs ? 'fullscreen' : (isBl ? 'borderless' : 'windowed');
+  const showFps = document.getElementById('chkShowFps').checked;
+  const showHud = document.getElementById('chkShowPerfHud').checked;
+  const ovMode = showHud ? 'detailed' : (showFps ? 'fps' : 'off');
   const settings = {
     game_dir: document.getElementById('inputGameDir').value,
     resolution: document.getElementById('selectRes').value,
@@ -519,14 +577,17 @@ function onSettingChanged() {
     upscaler_quality: document.getElementById('selectUpscalerQuality').value,
     aspect_ratio: document.getElementById('selectAspect').value,
     vsync_mode: document.getElementById('selectVsync').value,
-    fullscreen: document.getElementById('chkFullscreen').checked,
-    borderless: document.getElementById('chkBorderless').checked,
-    show_fps: document.getElementById('chkShowFps').checked,
-    show_perf_hud: document.getElementById('chkShowPerfHud').checked,
+    fullscreen: isFs,
+    borderless: isBl,
+    display_mode: dispMode,
+    show_fps: showFps,
+    show_perf_hud: showHud,
+    fps_overlay_mode: ovMode,
     compile_shaders_bg: document.getElementById('chkCompileShaders').checked,
     hide_launcher_on_play: document.getElementById('chkHideLauncher').checked,
     auto_backup_saves: document.getElementById('chkAutoBackup') ? document.getElementById('chkAutoBackup').checked : true,
     check_updates_startup: document.getElementById('chkUpdateStartup').checked,
+    discord_rpc: document.getElementById('chkDiscordRpc') ? document.getElementById('chkDiscordRpc').checked : true,
     audio_volume: document.getElementById('rngVolume').value,
     language: currentLang,
     theme: currentTheme,

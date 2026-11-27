@@ -64,10 +64,12 @@ import trophy_manager
 import indo_patcher
 import auto_updater
 import session_tracker
+import diagnostics
+import discord_rpc
 import ctypes
 import urllib.request
 
-CURRENT_VERSION = "v1.3.1-PC-Native"
+CURRENT_VERSION = "v1.3.2-PC-Native"
 _HW_CACHE = None
 
 
@@ -146,10 +148,13 @@ def _detect_hardware_summary() -> dict:
     gpu_up = gpu_name.upper()
     if any(k in gpu_up for k in ("RTX", "RX 6", "RX 7", "RX 9")) and ram_gb >= 16:
         recommended = "Native Ultra Fidelity (1080p/1440p · 60 FPS)"
+        recommended_preset = "fidelity"
     elif any(k in gpu_up for k in ("GTX", "RADEON", "RX ")) and ram_gb >= 8:
         recommended = "Balanced (1080p · AMD FSR 3.1 Quality · 60 FPS)"
+        recommended_preset = "balanced"
     else:
         recommended = "Potato PC (720p · AMD FSR Performance · 60 FPS)"
+        recommended_preset = "potato"
 
     _HW_CACHE = {
         "cpu": f"{cpu_name} ({cpu_cores}T)" if cpu_cores else cpu_name,
@@ -159,6 +164,7 @@ def _detect_hardware_summary() -> dict:
         "os": os_name,
         "disk_free": f"{disk_free_gb} GB free on {disk_drive}",
         "recommended": recommended,
+        "recommended_preset": recommended_preset,
     }
     return _HW_CACHE
 
@@ -194,6 +200,11 @@ class LauncherAPI:
         self.game_info = get_game_info(self.game_dir)
         self.game_ver = self.game_info.get("APP_VER", "01.00")
         self.active_proc = None
+        self.rpc = discord_rpc.DiscordRPC()
+        rpc_enabled = (str(self.ini_data.get("discord_rpc", "true")).lower() == "true")
+        self.rpc.set_enabled(rpc_enabled)
+        if rpc_enabled:
+            self.rpc.set_launcher_status(CURRENT_VERSION)
 
     def get_initial_data(self):
         controllers = get_connected_controllers()
@@ -215,8 +226,11 @@ class LauncherAPI:
             "upscaler_quality": self.ini_data.get("upscaler_quality", "Quality (67%)"),
             "fullscreen": self.ini_data.get("fullscreen", "false"),
             "borderless": self.ini_data.get("borderless", "true"),
+            "display_mode": self.ini_data.get("display_mode", "borderless"),
             "show_fps": self.ini_data.get("show_fps", "true"),
             "show_perf_hud": self.ini_data.get("show_perf_hud", "false"),
+            "fps_overlay_mode": self.ini_data.get("fps_overlay_mode", "fps"),
+            "discord_rpc": self.ini_data.get("discord_rpc", "true"),
             "aspect_ratio": self.ini_data.get("aspect_ratio", "16:9"),
             "compile_shaders_bg": self.ini_data.get("compile_shaders_bg", "true"),
             "vsync_mode": self.ini_data.get("vsync_mode", "Mailbox (Fastest / Unlocked)"),
@@ -247,6 +261,11 @@ class LauncherAPI:
             self.ini_data[k] = str(v)
         save_launcher_config(self.ini_data)
         
+        rpc_enabled = (str(self.ini_data.get("discord_rpc", "true")).lower() == "true")
+        self.rpc.set_enabled(rpc_enabled)
+        if rpc_enabled:
+            self.rpc.set_launcher_status(CURRENT_VERSION)
+
         # Sync engine config immediately
         sync_engine_config(
             resolution=self.ini_data.get("resolution", "1080p (Native FHD)"),
@@ -260,7 +279,10 @@ class LauncherAPI:
             aspect_ratio=self.ini_data.get("aspect_ratio", "16:9"),
             compile_shaders_bg=(str(self.ini_data.get("compile_shaders_bg", "true")).lower() == "true"),
             vsync_mode=self.ini_data.get("vsync_mode", "Mailbox (Fastest / Unlocked)"),
-            audio_volume=int(float(self.ini_data.get("audio_volume", "100")))
+            audio_volume=int(float(self.ini_data.get("audio_volume", "100"))),
+            display_mode=self.ini_data.get("display_mode", "borderless"),
+            fps_overlay_mode=self.ini_data.get("fps_overlay_mode", "fps"),
+            discord_rpc=rpc_enabled
         )
 
     def browse_game_dir(self):
@@ -338,7 +360,11 @@ class LauncherAPI:
         up = self.ini_data.get("upscaler", "Off (Native)")
         up_qual = self.ini_data.get("upscaler_quality", "Quality (67%)")
         show_fps = (str(self.ini_data.get("show_fps")).lower() == "true")
+        show_perf_hud = (str(self.ini_data.get("show_perf_hud", "false")).lower() == "true")
         borderless = (str(self.ini_data.get("borderless", "true")).lower() == "true")
+        display_mode = self.ini_data.get("display_mode", "borderless")
+        fps_overlay_mode = self.ini_data.get("fps_overlay_mode", "fps")
+        rpc_enabled = (str(self.ini_data.get("discord_rpc", "true")).lower() == "true")
         aspect_ratio = self.ini_data.get("aspect_ratio", "16:9")
         vsync_mode = self.ini_data.get("vsync_mode", "Mailbox (Fastest / Unlocked)")
         compile_shaders_bg = (str(self.ini_data.get("compile_shaders_bg", "true")).lower() == "true")
@@ -374,6 +400,8 @@ class LauncherAPI:
             t_start = time.time()
             exit_code = 0
             try:
+                if rpc_enabled:
+                    self.rpc.set_playing_status(res, fps)
                 proc = launch_game(
                     game_dir=self.game_dir,
                     resolution=res,
@@ -383,6 +411,10 @@ class LauncherAPI:
                     upscaler_quality=up_qual,
                     show_fps=show_fps,
                     borderless=borderless,
+                    show_perf_hud=show_perf_hud,
+                    display_mode=display_mode,
+                    fps_overlay_mode=fps_overlay_mode,
+                    discord_rpc=rpc_enabled,
                     aspect_ratio=aspect_ratio,
                     vsync_mode=vsync_mode,
                     compile_shaders_bg=compile_shaders_bg,
@@ -398,6 +430,8 @@ class LauncherAPI:
                 main_window.evaluate_js(f"alert('Launch Failed: {str(err)}');")
             finally:
                 end_session(proc)
+                if rpc_enabled:
+                    self.rpc.set_launcher_status(CURRENT_VERSION)
                 elapsed = time.time() - t_start
                 new_stats = session_tracker.record_session(BASE_DIR, elapsed, exit_code)
                 if close_on_exit:
@@ -600,6 +634,28 @@ class LauncherAPI:
     def open_port_folder(self):
         os.startfile(str(BASE_DIR))
         return "Opened port folder."
+
+    def export_diagnostic_bundle(self):
+        global main_window
+        import datetime
+        default_name = f"KR_Diagnostic_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+        dest = None
+        if main_window:
+            res = main_window.create_file_dialog(
+                webview.SAVE_DIALOG,
+                directory=str(BASE_DIR),
+                save_filename=default_name,
+                file_types=('Diagnostic Archive (*.zip)', '*.zip')
+            )
+            if res:
+                dest = Path(res[0] if isinstance(res, (list, tuple)) else res)
+        if not dest:
+            return {"success": False, "message": "Cancelled."}
+        if dest.suffix.lower() != ".zip":
+            dest = dest.with_suffix(".zip")
+        return diagnostics.export_diagnostic_bundle(
+            BASE_DIR, dest, _detect_hardware_summary(), CURRENT_VERSION, self.game_dir
+        )
 
     def verify_game_files(self):
         eboot = self.game_dir / "eboot.bin"

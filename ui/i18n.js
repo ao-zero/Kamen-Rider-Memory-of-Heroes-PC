@@ -136,7 +136,14 @@ window.I18N = {
     btn_test_sm: "Tes Notif",
     lbl_press_key: "Tekan Tombol / Klik...",
     msg_specs_copied: "Spesifikasi sistem disalin ke clipboard!",
-    msg_no_pkg_found: "Tidak ada file .pkg di folder root. Gunakan tombol 'Pilih .PKG...' di kanan."
+    msg_no_pkg_found: "Tidak ada file .pkg di folder root. Gunakan tombol 'Pilih .PKG...' di kanan.",
+    btn_apply_recommended: "Terapkan Rekomendasi",
+    btn_export_diag: "Ekspor Diagnostik (.zip)",
+    chk_discord_rpc: "Aktifkan Discord Rich Presence",
+    opt_fps_off: "Mati",
+    opt_fps_only: "FPS",
+    opt_fps_detailed: "Detail",
+    msg_preset_applied: "Preset rekomendasi berhasil diterapkan!"
   },
 
   en: {
@@ -261,7 +268,14 @@ window.I18N = {
     btn_test_sm: "Test",
     lbl_press_key: "Press Key / Click...",
     msg_specs_copied: "System specs copied to clipboard!",
-    msg_no_pkg_found: "No .pkg files found in root folder. Click 'Browse .PKG...' on the right to install manually."
+    msg_no_pkg_found: "No .pkg files found in root folder. Click 'Browse .PKG...' on the right to install manually.",
+    btn_apply_recommended: "Apply Recommended",
+    btn_export_diag: "Export Diagnostic (.zip)",
+    chk_discord_rpc: "Enable Discord Rich Presence",
+    opt_fps_off: "Off",
+    opt_fps_only: "FPS",
+    opt_fps_detailed: "Detailed",
+    msg_preset_applied: "Recommended preset applied!"
   },
 
   es: {
@@ -386,7 +400,14 @@ window.I18N = {
     btn_test_sm: "Probar",
     lbl_press_key: "Pulsa una tecla / clic...",
     msg_specs_copied: "¡Especificaciones copiadas al portapapeles!",
-    msg_no_pkg_found: "No se encontraron archivos .pkg en la carpeta raíz. Usa 'Elegir .PKG...' a la derecha."
+    msg_no_pkg_found: "No se encontraron archivos .pkg en la carpeta raíz. Usa 'Elegir .PKG...' a la derecha.",
+    btn_apply_recommended: "Aplicar Recomendado",
+    btn_export_diag: "Exportar Diagnóstico (.zip)",
+    chk_discord_rpc: "Activar Discord Rich Presence",
+    opt_fps_off: "No",
+    opt_fps_only: "FPS",
+    opt_fps_detailed: "Detallado",
+    msg_preset_applied: "¡Perfil recomendado aplicado!"
   },
 
   'pt-BR': {
@@ -511,7 +532,14 @@ window.I18N = {
     btn_test_sm: "Testar",
     lbl_press_key: "Pressione uma tecla / clique...",
     msg_specs_copied: "Especificações copiadas para a área de transferência!",
-    msg_no_pkg_found: "Nenhum arquivo .pkg encontrado na pasta raiz. Use 'Escolher .PKG...' à direita."
+    msg_no_pkg_found: "Nenhum arquivo .pkg encontrado na pasta raiz. Use 'Escolher .PKG...' à direita.",
+    btn_apply_recommended: "Aplicar Recomendado",
+    btn_export_diag: "Exportar Diagnóstico (.zip)",
+    chk_discord_rpc: "Ativar Discord Rich Presence",
+    opt_fps_off: "Off",
+    opt_fps_only: "FPS",
+    opt_fps_detailed: "Detalhado",
+    msg_preset_applied: "Perfil recomendado aplicado!"
   },
 
   'pt-PT': {
@@ -636,7 +664,14 @@ window.I18N = {
     btn_test_sm: "Testar",
     lbl_press_key: "Prima uma tecla / clique...",
     msg_specs_copied: "Especificações copiadas para a área de transferência!",
-    msg_no_pkg_found: "Nenhum ficheiro .pkg encontrado na pasta raiz. Utilize 'Escolher .PKG...' à direita."
+    msg_no_pkg_found: "Nenhum ficheiro .pkg encontrado na pasta raiz. Utilize 'Escolher .PKG...' à direita.",
+    btn_apply_recommended: "Aplicar Recomendado",
+    btn_export_diag: "Exportar Diagnóstico (.zip)",
+    chk_discord_rpc: "Ativar Discord Rich Presence",
+    opt_fps_off: "Off",
+    opt_fps_only: "FPS",
+    opt_fps_detailed: "Detalhado",
+    msg_preset_applied: "Perfil recomendado aplicado!"
   }
 };
 

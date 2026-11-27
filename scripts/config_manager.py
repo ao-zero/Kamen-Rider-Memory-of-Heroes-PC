@@ -39,8 +39,11 @@ DEFAULT_CONFIG = {
     "upscaler_quality": "Quality (67%)",
     "fullscreen": "false",
     "borderless": "true",
+    "display_mode": "borderless",
     "show_fps": "true",
     "show_perf_hud": "false",
+    "fps_overlay_mode": "fps",
+    "discord_rpc": "true",
     "aspect_ratio": "16:9",
     "compile_shaders_bg": "true",
     "vsync_mode": "Mailbox (Fastest / Unlocked)",
@@ -120,8 +123,34 @@ def load_launcher_config() -> dict:
         result["upscaler"] = upscaler_aliases[result["upscaler"]]
     for bool_key in ("fullscreen", "borderless", "show_fps", "show_perf_hud", "compile_shaders_bg",
                      "hide_launcher_on_play", "close_launcher_on_exit", "check_updates_startup",
-                     "auto_install_updates", "auto_backup_saves", "indo_patch"):
+                     "auto_install_updates", "auto_backup_saves", "indo_patch", "discord_rpc"):
         result[bool_key] = str(result.get(bool_key, DEFAULT_CONFIG[bool_key])).strip().lower()
+
+    # Keep display_mode synchronized with fullscreen/borderless flags
+    dm = str(result.get("display_mode", "")).strip().lower()
+    if dm not in ("windowed", "borderless", "fullscreen"):
+        if result["fullscreen"] == "true":
+            dm = "fullscreen"
+        elif result["borderless"] == "true":
+            dm = "borderless"
+        else:
+            dm = "windowed"
+    result["display_mode"] = dm
+    result["fullscreen"] = "true" if dm == "fullscreen" else "false"
+    result["borderless"] = "true" if dm == "borderless" else "false"
+
+    # Keep fps_overlay_mode synchronized with show_fps/show_perf_hud flags
+    om = str(result.get("fps_overlay_mode", "")).strip().lower()
+    if om not in ("off", "fps", "detailed"):
+        if result["show_perf_hud"] == "true":
+            om = "detailed"
+        elif result["show_fps"] == "true":
+            om = "fps"
+        else:
+            om = "off"
+    result["fps_overlay_mode"] = om
+    result["show_fps"] = "false" if om == "off" else "true"
+    result["show_perf_hud"] = "true" if om == "detailed" else "false"
 
     return result
 

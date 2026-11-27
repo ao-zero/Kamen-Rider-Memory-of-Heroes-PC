@@ -24,6 +24,7 @@ BASE_DIR = get_base_dir()
 BIN_DIR = BASE_DIR / "bin"
 CORE_EXE = BIN_DIR / "kr_core.exe"
 CONFIG_JSON = BIN_DIR / "user" / "config.json"
+IMGUI_INI = BIN_DIR / "user" / "imgui.ini"
 LOG_DIR = BIN_DIR / "user" / "log"
 
 # Serialises every read-modify-write of config.json. pywebview runs each JS API
@@ -106,6 +107,113 @@ def _write_json_atomic(path: Path, data: dict):
         json.dump(data, f, indent=2)
     os.replace(tmp, path)
 
+def _get_primary_monitor_size():
+    """Return (width, height) of the primary monitor on Windows."""
+    if sys.platform == "win32":
+        try:
+            u32 = ctypes.windll.user32
+            w = int(u32.GetSystemMetrics(0))
+            h = int(u32.GetSystemMetrics(1))
+            if w > 0 and h > 0:
+                return (w, h)
+        except Exception:
+            pass
+    return (1920, 1080)
+
+def _resolve_display_mode(display_mode: str = "", fullscreen: bool = False, borderless: bool = True) -> str:
+    dm = (display_mode or "").strip().lower()
+    if dm in ("windowed", "window"):
+        return "windowed"
+    if dm == "borderless":
+        return "borderless"
+    if dm == "fullscreen":
+        return "fullscreen"
+    if fullscreen:
+        return "fullscreen"
+    if borderless:
+        return "borderless"
+    return "windowed"
+
+def _resolve_fps_overlay_mode(fps_overlay_mode: str = "", show_fps: bool = True, show_perf_hud: bool = False) -> str:
+    om = (fps_overlay_mode or "").strip().lower()
+    if om in ("off", "fps", "detailed"):
+        return om
+    if show_perf_hud:
+        return "detailed"
+    if show_fps:
+        return "fps"
+    return "off"
+
+def _sync_imgui_overlay(overlay_mode: str):
+    """Update [DevtoolsLayer][Data] in bin/user/imgui.ini for FPS Only vs FPS Detailed."""
+    try:
+        IMGUI_INI.parent.mkdir(parents=True, exist_ok=True)
+        detailed = (overlay_mode == "detailed")
+        want_graph = "1" if detailed else "0"
+        want_gpu = "1" if detailed else "0"
+
+        if IMGUI_INI.is_file():
+            lines = IMGUI_INI.read_text(encoding="utf-8", errors="replace").splitlines()
+        else:
+            lines = []
+
+        out = []
+        in_devtools = False
+        found_section = False
+        set_graph = False
+        set_gpu = False
+
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("[") and stripped.endswith("]"):
+                if in_devtools:
+                    if not set_graph:
+                        out.append(f"show_frame_graph={want_graph}")
+                    if not set_gpu:
+                        out.append(f"show_gpu_memory={want_gpu}")
+                in_devtools = (stripped == "[DevtoolsLayer][Data]")
+                if in_devtools:
+                    found_section = True
+                out.append(line)
+                continue
+
+            if in_devtools:
+                if stripped.startswith("show_frame_graph="):
+                    out.append(f"show_frame_graph={want_graph}")
+                    set_graph = True
+                    continue
+                if stripped.startswith("show_gpu_memory="):
+                    out.append(f"show_gpu_memory={want_gpu}")
+                    set_gpu = True
+                    continue
+            out.append(line)
+
+        if in_devtools:
+            if not set_graph:
+                out.append(f"show_frame_graph={want_graph}")
+            if not set_gpu:
+                out.append(f"show_gpu_memory={want_gpu}")
+        elif not found_section:
+            if out and out[-1].strip():
+                out.append("")
+            out.extend([
+                "[DevtoolsLayer][Data]",
+                "fps_scale=1.000000",
+                "show_advanced_debug=0",
+                f"show_frame_graph={want_graph}",
+                "show_shader_list=0",
+                "show_memory_map=0",
+                "show_module_list=0",
+                f"show_gpu_memory={want_gpu}",
+                "dump_frame_count=1",
+            ])
+
+        tmp = IMGUI_INI.with_suffix(".ini.tmp")
+        tmp.write_text("\n".join(out) + "\n", encoding="utf-8")
+        os.replace(tmp, IMGUI_INI)
+    except Exception as e:
+        print(f"[ENGINE CONFIG] Warning: Could not sync imgui.ini: {e}")
+
 def sync_engine_config(
     resolution: str = "1080p (Native FHD)",
     fps: str = "60 FPS (Native Unlock)",
@@ -118,7 +226,10 @@ def sync_engine_config(
     aspect_ratio: str = "16:9",
     compile_shaders_bg: bool = True,
     vsync_mode: str = "Mailbox (Fastest / Unlocked)",
-    audio_volume: int = 100
+    audio_volume: int = 100,
+    display_mode: str = "",
+    fps_overlay_mode: str = "",
+    discord_rpc: bool = True
 ):
     """Sync graphics and display settings directly to engine config.json with maximum optimization."""
     if not CONFIG_JSON.is_file():
@@ -130,6 +241,8 @@ def sync_engine_config(
 
             int_w, int_h, win_w, win_h = RES_MAP.get(resolution, (1920, 1080, 1920, 1080))
             target_vblank = FPS_VBLANK_MAP.get(fps, 120)
+            mode = _resolve_display_mode(display_mode, fullscreen, borderless)
+            ov_mode = _resolve_fps_overlay_mode(fps_overlay_mode, show_fps, show_perf_hud)
 
             # Apply Upscaler Scale if FSR or DLSS is selected
             use_fsr = "FSR" in upscaler or "Potato" in resolution
@@ -139,13 +252,30 @@ def sync_engine_config(
                 int_h = int(win_h * scale)
                 use_fsr = True
 
+            # Windowed mode: ensure window fits comfortably inside monitor with visible titlebar
+            if mode == "windowed":
+                mon_w, mon_h = _get_primary_monitor_size()
+                if win_w >= mon_w or win_h >= mon_h:
+                    if mon_w >= 2560 and mon_h >= 1440:
+                        win_w, win_h = 1600, 900
+                    else:
+                        win_w, win_h = 1280, 720
+
             gpu = cfg.setdefault("GPU", {})
             gpu["window_width"] = win_w
             gpu["window_height"] = win_h
             gpu["internal_screen_width"] = int_w
             gpu["internal_screen_height"] = int_h
-            gpu["full_screen"] = fullscreen
-            gpu["full_screen_mode"] = "Borderless" if (borderless or fullscreen) else "Windowed"
+            # kr_core.exe expects exact strings: "Fullscreen (Borderless)" or "Fullscreen"
+            if mode == "fullscreen":
+                gpu["full_screen"] = True
+                gpu["full_screen_mode"] = "Fullscreen"
+            elif mode == "borderless":
+                gpu["full_screen"] = True
+                gpu["full_screen_mode"] = "Fullscreen (Borderless)"
+            else:
+                gpu["full_screen"] = False
+                gpu["full_screen_mode"] = "Fullscreen (Borderless)"
             gpu["vblank_frequency"] = target_vblank
             gpu["present_mode"] = _present_mode(vsync_mode)
             gpu["fsr_enabled"] = use_fsr
@@ -168,7 +298,8 @@ def sync_engine_config(
             vulkan["pipeline_cache_archived"] = True
 
             gen = cfg.setdefault("General", {})
-            gen["show_fps_counter"] = show_fps
+            gen["show_fps_counter"] = (ov_mode != "off")
+            gen["discord_rpc_enabled"] = bool(discord_rpc)
             gen["show_splash"] = False
             gen["dev_kit_mode"] = False
             try:
@@ -194,8 +325,9 @@ def sync_engine_config(
             inp["background_controller_input"] = True
 
             _write_json_atomic(CONFIG_JSON, cfg)
+            _sync_imgui_overlay(ov_mode)
 
-            print(f"[ENGINE CONFIG] Optimized: {int_w}x{int_h} -> {win_w}x{win_h} | VBlank: {target_vblank}Hz ({fps}) | Present: {gpu['present_mode']} | Volume: {gen['volume_slider']}")
+            print(f"[ENGINE CONFIG] Mode: {mode} ({gpu['full_screen_mode']}) | {int_w}x{int_h} -> {win_w}x{win_h} | Overlay: {ov_mode} | VBlank: {target_vblank}Hz ({fps}) | Present: {gpu['present_mode']}")
         except Exception as e:
             print(f"[ENGINE CONFIG] Warning: Could not sync config.json: {e}")
 
@@ -337,6 +469,16 @@ def launch_game(
         raise FileNotFoundError(f"File eboot.bin not found at: {eboot}")
 
     # 1. Sync engine settings with performance enhancements
+    mode = _resolve_display_mode(
+        extra_settings.get("display_mode", ""),
+        fullscreen,
+        extra_settings.get("borderless", True),
+    )
+    ov_mode = _resolve_fps_overlay_mode(
+        extra_settings.get("fps_overlay_mode", ""),
+        show_fps,
+        extra_settings.get("show_perf_hud", False),
+    )
     sync_engine_config(
         resolution=resolution,
         fps=fps,
@@ -348,12 +490,13 @@ def launch_game(
     )
 
     # 2. Build command line
+    want_fs_flag = (mode in ("borderless", "fullscreen"))
     cmd = [
         str(core_exe),
         "-g", str(eboot.resolve()),
-        "-f", "true" if fullscreen else "false"
+        "-f", "true" if want_fs_flag else "false"
     ]
-    if show_fps:
+    if ov_mode != "off":
         cmd.append("--show-fps")
 
     env = dict(os.environ)

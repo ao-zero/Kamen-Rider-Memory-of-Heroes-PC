@@ -83,7 +83,7 @@
     <section id="tab-play" class="tab-pane active">
       <div class="hero-banner">
         <div class="hero-top">
-          <div class="hero-crumb" id="footerStatus">CUSA17374 · PC Native Edition v1.3.1</div>
+          <div class="hero-crumb" id="footerStatus">CUSA17374 · PC Native Edition v1.3.2</div>
         </div>
         <div class="hero-bottom">
           <img src="assets/game_icon_rounded.png" alt="Cover" class="hero-poster">
@@ -209,7 +209,7 @@
                 <button class="head-action red" onclick="clearLog()" data-i18n="btn_clear_short">Clear</button>
               </div>
             </div>
-            <pre id="terminalLog" class="terminal-log-box">[INIT] Kamen Rider: Memory of Heroes PC Native v1.3.1 Ready.
+            <pre id="terminalLog" class="terminal-log-box">[INIT] Kamen Rider: Memory of Heroes PC Native v1.3.2 Ready.
 [VULKAN] Direct memory pool (2048MB DMEM / 1024MB FMEM) enabled.
 [SCHEDULER] Windows 1ms Precision Timer ready.</pre>
           </div>
@@ -232,7 +232,7 @@
             <div class="spec-row">
               <span class="spec-label" data-i18n="lbl_start_in">Start in</span>
               <div class="seg-bar" id="segGroupDisplay">
-                <button class="seg-opt" data-val="window" onclick="setQuickDisplay('window')">Window</button>
+                <button class="seg-opt" data-val="windowed" onclick="setQuickDisplay('windowed')">Window</button>
                 <button class="seg-opt active" data-val="borderless" onclick="setQuickDisplay('borderless')">Borderless</button>
                 <button class="seg-opt" data-val="fullscreen" onclick="setQuickDisplay('fullscreen')">Fullscreen</button>
               </div>
@@ -241,8 +241,9 @@
             <div class="spec-row">
               <span class="spec-label" data-i18n="lbl_fps_overlay">FPS overlay</span>
               <div class="seg-bar" id="segGroupHud">
-                <button class="seg-opt active" data-val="on" onclick="setQuickFpsHud(true)">On</button>
-                <button class="seg-opt" data-val="off" onclick="setQuickFpsHud(false)">Off</button>
+                <button class="seg-opt" data-val="off" onclick="setQuickFpsOverlay('off')" data-i18n="opt_fps_off">Off</button>
+                <button class="seg-opt active" data-val="fps" onclick="setQuickFpsOverlay('fps')" data-i18n="opt_fps_only">FPS</button>
+                <button class="seg-opt" data-val="detailed" onclick="setQuickFpsOverlay('detailed')" data-i18n="opt_fps_detailed">Detailed</button>
               </div>
               <span></span>
             </div>
@@ -549,13 +550,14 @@
 
           <div class="checkbox-row-container">
             <label class="custom-checkbox-label"><input type="checkbox" id="chkCompileShaders" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_async_shaders">Compile shaders in background (Async Fast Math)</span></label>
-            <label class="custom-checkbox-label"><input type="checkbox" id="chkShowFps" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_show_fps">FPS counter in the corner</span></label>
-            <label class="custom-checkbox-label"><input type="checkbox" id="chkShowPerfHud" onchange="onSettingChanged()"><span class="check-box-custom"></span><span data-i18n="chk_show_hud">Performance &amp; Frame Time HUD</span></label>
-            <label class="custom-checkbox-label"><input type="checkbox" id="chkFullscreen" onchange="onSettingChanged()"><span class="check-box-custom"></span><span data-i18n="chk_fullscreen">Fullscreen</span></label>
-            <label class="custom-checkbox-label"><input type="checkbox" id="chkBorderless" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_borderless">Borderless window</span></label>
+            <label class="custom-checkbox-label"><input type="checkbox" id="chkShowFps" onchange="onFpsCheckboxChanged('fps')" checked><span class="check-box-custom"></span><span data-i18n="chk_show_fps">FPS counter in the corner</span></label>
+            <label class="custom-checkbox-label"><input type="checkbox" id="chkShowPerfHud" onchange="onFpsCheckboxChanged('detailed')"><span class="check-box-custom"></span><span data-i18n="chk_show_hud">Performance &amp; Frame Time HUD</span></label>
+            <label class="custom-checkbox-label"><input type="checkbox" id="chkFullscreen" onchange="onDisplayCheckboxChanged('fullscreen')"><span class="check-box-custom"></span><span data-i18n="chk_fullscreen">Fullscreen</span></label>
+            <label class="custom-checkbox-label"><input type="checkbox" id="chkBorderless" onchange="onDisplayCheckboxChanged('borderless')" checked><span class="check-box-custom"></span><span data-i18n="chk_borderless">Borderless window</span></label>
             <label class="custom-checkbox-label"><input type="checkbox" id="chkHideLauncher" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_hide_launcher">Hide launcher during gameplay</span></label>
             <label class="custom-checkbox-label"><input type="checkbox" id="chkAutoBackup" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_auto_backup">Auto-backup saves before launching game (keeps last 5)</span></label>
             <label class="custom-checkbox-label"><input type="checkbox" id="chkUpdateStartup" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_update_startup">Check for updates on startup</span></label>
+            <label class="custom-checkbox-label"><input type="checkbox" id="chkDiscordRpc" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_discord_rpc">Enable Discord Rich Presence</span></label>
           </div>
         </div>
 
@@ -580,7 +582,7 @@
             </div>
             <div class="form-field">
               <label class="field-label" data-i18n="lbl_updates_status">Updates Status:</label>
-              <div id="updateStatusText" style="font-size:12px;color:var(--green-text);padding-top:8px;">● v1.3.1-PC-Native (Latest)</div>
+              <div id="updateStatusText" style="font-size:12px;color:var(--green-text);padding-top:8px;">● v1.3.2-PC-Native (Latest)</div>
             </div>
           </div>
         </div>
@@ -589,7 +591,10 @@
         <div class="spec-card" style="margin-bottom:14px;">
           <div class="spec-head">
             <span class="spec-kicker" data-i18n="card_specs">SYSTEM SPECS</span>
-            <button class="head-action" onclick="copySystemSpecs()" data-i18n="btn_copy_specs">Copy Specs</button>
+            <div style="display:flex;gap:12px;">
+              <button class="head-action" onclick="applyRecommendedPreset()" data-i18n="btn_apply_recommended">Apply Recommended</button>
+              <button class="head-action" onclick="copySystemSpecs()" data-i18n="btn_copy_specs">Copy Specs</button>
+            </div>
           </div>
           <div class="spec-row">
             <span class="spec-label" data-i18n="lbl_cpu">Processor (CPU)</span>
@@ -632,6 +637,7 @@
             <button class="btn-tool" onclick="cleanTempFiles()" data-i18n="btn_clean_temp">Clean Temp Files</button>
             <button class="btn-tool" onclick="importSettings()" data-i18n="btn_import_settings">Import Settings...</button>
             <button class="btn-tool" onclick="openPortFolder()" data-i18n="btn_open_port">Open Port Folder</button>
+            <button class="btn-tool" onclick="exportDiagnosticBundle()" data-i18n="btn_export_diag">Export Diagnostic (.zip)</button>
             <button class="btn-tool" onclick="resetAllSettings()" data-i18n="btn_reset_settings" style="color:var(--red-text);">Reset All Settings</button>
           </div>
         </div>
