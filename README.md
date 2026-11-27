@@ -196,10 +196,6 @@ You can either build from source (`pip install -r requirements.txt` & `build.bat
 
 ## Acknowledgments & Technical References
 
-- **[XSEmu](https://github.com/zortos293/xsemu)** *(by zortos293 · GPL-2.0)*  
-  *Repository:* [zortos293/xsemu](https://github.com/zortos293/xsemu)  
-  *Attribution:* Primary UI/UX design inspiration for the Clean Desktop launcher layout, single-game hero detail view, 2×2 hairline spec cards, and segmented Quick Overrides.
-
 - **[shadPS4 Emulator](https://github.com/shadps4-emu/shadPS4)**  
   *Official Site:* [shadps4.net](https://shadps4.net/) &bull; *GitHub:* [shadps4-emu/shadPS4](https://github.com/shadps4-emu/shadPS4)  
   *Attribution:* Open-source PlayStation 4 emulator delivering direct Vulkan 1.3 translation, x86-64 native execution, pipeline caching, and custom trophy architecture (`custom_trophy/` and `trophy_notification_side: "right"`).
@@ -224,6 +220,10 @@ You can either build from source (`pip install -r requirements.txt` & `build.bat
 - **[Bakka Sub](https://www.bakkasub.my.id)**  
   *Community Partner:* [www.bakkasub.my.id](https://www.bakkasub.my.id)  
   *Attribution:* Indonesian Tokusatsu fansub provider, Indonesian subtitle localization, Tokusatsu preservation, and community partner.
+
+- **[XSEmu](https://github.com/zortos293/xsemu)** *(by zortos293 · GPL-2.0)*  
+  *Repository:* [zortos293/xsemu](https://github.com/zortos293/xsemu)  
+  *Attribution:* UI/UX design inspiration for the Clean Desktop launcher layout, single-game hero detail view, 2×2 hairline spec cards, and segmented Quick Overrides.
 
 ---
 
