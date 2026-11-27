@@ -17,8 +17,8 @@ import time
 import uuid
 from ctypes import wintypes
 
-# Default Discord Application ID (can be overridden via launcher.ini -> discord_client_id)
-DEFAULT_CLIENT_ID = "1274824899621523508"
+# Default Discord Application ID for Kamen Rider: Memory of Heroes PC Native
+DEFAULT_CLIENT_ID = "1575864005409505330"
 
 GENERIC_READ = 0x80000000
 GENERIC_WRITE = 0x40000000
