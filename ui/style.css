@@ -150,42 +150,46 @@ body {
 .hero-header {
   background: var(--bg-sidebar);
   border-bottom: 2.5px solid var(--border-color);
-  padding: 12px 20px;
+  padding: 10px 16px;
 }
 
 .hero-banner-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 10px;
+  min-width: 0;
 }
 
 .brand-cluster {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
-  flex-shrink: 0;
+  flex: 1 1 auto;
 }
 
 .brand-avatar {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--radius-control);
   border: 2.5px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   object-fit: cover;
+  flex-shrink: 0;
 }
 
-.brand-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.brand-top-row { display: flex; align-items: center; gap: 8px; }
+.brand-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow: hidden; }
+.brand-top-row { display: flex; align-items: center; gap: 7px; min-width: 0; }
 
 .brand-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.2px;
   color: var(--text-main);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .brand-wm-badge {
@@ -194,45 +198,57 @@ body {
   background: var(--secondary);
   border: 2px solid var(--border-color);
   box-shadow: 2px 2px 0 var(--ink);
-  padding: 2px 8px;
+  padding: 1px 7px;
   border-radius: var(--radius-chip);
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 800;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   color: #FFFFFF;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .brand-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
+  gap: 5px;
+  font-size: 10.5px;
   font-weight: 600;
   font-family: var(--font-mono);
   color: var(--text-muted);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .meta-sep { color: var(--text-dim); }
 
-.header-right-panel { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.badge-stack { display: flex; align-items: center; gap: 8px; }
+.header-right-panel { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.badge-stack { display: flex; align-items: center; gap: 6px; min-width: 0; }
 
 .header-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
+  gap: 5px;
+  height: 30px;
   background: var(--bg-card);
   border: 2px solid var(--border-color);
   box-shadow: var(--shadow-sm);
-  padding: 0 10px;
+  padding: 0 8px;
   border-radius: var(--radius-chip);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   font-family: var(--font-mono);
   color: var(--text-main);
+  white-space: nowrap;
+}
+
+#badgeGamepad {
+  max-width: 175px;
+}
+#badgeGamepadText {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -246,20 +262,21 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 32px;
+  gap: 5px;
+  height: 30px;
   background: var(--bg-card);
   border: 2px solid var(--border-color);
   box-shadow: var(--shadow-sm);
-  padding: 0 10px;
+  padding: 0 9px;
   border-radius: var(--radius-chip);
   color: var(--text-main);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   font-family: var(--font-mono);
   cursor: pointer;
   transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-lang-toggle:hover,
@@ -1298,8 +1315,22 @@ body {
 .btn-pad-option:hover { background: var(--primary); color: var(--primary-ink); }
 
 /* ==========================================================================
-   RESPONSIVE (Wide Displays)
+   RESPONSIVE (Compact / Resizable Window + Wide Displays)
    ========================================================================== */
+@media (max-width: 1140px) {
+  .brand-wm-badge { display: none; }
+  #badgeGamepad { max-width: 145px; }
+}
+
+@media (max-width: 960px) {
+  .hero-banner-content { flex-wrap: wrap; row-gap: 8px; }
+  .header-right-panel { width: 100%; justify-content: flex-end; }
+  #badgeGamepad { max-width: 200px; }
+  .sidebar-nav { width: 185px; min-width: 185px; }
+  .form-grid-2 { grid-template-columns: 1fr; }
+  .preset-button-grid { grid-template-columns: 1fr; }
+}
+
 @media (min-width: 1200px) {
   .sidebar-nav { width: 240px; min-width: 240px; padding: 16px 12px; }
   .content-viewport { padding: 24px 30px; }

@@ -550,9 +550,9 @@ def main():
         title="Kamen Rider: Memory of Heroes - PC Native Edition | AO Zero & Bakka Sub",
         url=str(html_file.resolve()),
         js_api=api,
-        width=1080,
+        width=1120,
         height=720,
-        min_size=(1020, 660),
+        min_size=(860, 600),
         background_color="#141418"
     )
 
