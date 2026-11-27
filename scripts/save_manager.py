@@ -90,6 +90,61 @@ def list_backups(base_dir: Path) -> list:
         })
     return backups
 
+def _safe_extract_zip(zip_path: Path, dest_dir: Path):
+    """Extract ZIP while blocking path traversal (Zip Slip) entries."""
+    dest_resolved = dest_dir.resolve()
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        for member in zf.infolist():
+            target = (dest_dir / member.filename).resolve()
+            if not str(target).startswith(str(dest_resolved)):
+                raise ValueError(f"Blocked unsafe zip entry: {member.filename}")
+        zf.extractall(dest_dir)
+
+
+def auto_backup_saves(base_dir: Path, keep: int = 5) -> dict:
+    """Create a rolling auto-backup before launching the game, keeping only the last `keep` auto-backups."""
+    sdir = get_save_dir(base_dir)
+    bdir = get_backup_dir(base_dir)
+    if not sdir.exists() or not any(sdir.iterdir()):
+        return {"success": False, "message": "No save files to auto-backup."}
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    zip_name = f"KR_AutoBackup_{timestamp}.zip"
+    zip_path = bdir / zip_name
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for root, dirs, files in os.walk(sdir):
+            for f in files:
+                full_path = Path(root) / f
+                rel_path = full_path.relative_to(sdir)
+                zf.write(full_path, arcname=str(rel_path))
+
+    # Prune older auto-backups beyond `keep`
+    auto_zips = sorted(bdir.glob("KR_AutoBackup_*.zip"), key=lambda x: x.stat().st_mtime, reverse=True)
+    for old_zip in auto_zips[keep:]:
+        try:
+            old_zip.unlink(missing_ok=True)
+        except Exception:
+            pass
+
+    return {"success": True, "filename": zip_name, "message": f"Auto-backup created: {zip_name}"}
+
+
+def import_save_zip(base_dir: Path, external_zip: Path) -> dict:
+    """Safely import a community/friend savegame ZIP archive into CUSA17374 saves."""
+    src_zip = Path(external_zip)
+    if not src_zip.is_file():
+        return {"success": False, "message": f"File not found: {src_zip}"}
+    sdir = get_save_dir(base_dir)
+    try:
+        backup_saves(base_dir)
+        sdir.mkdir(parents=True, exist_ok=True)
+        _safe_extract_zip(src_zip, sdir)
+        return {"success": True, "message": f"Successfully imported save archive: {src_zip.name} (previous saves backed up)."}
+    except Exception as e:
+        return {"success": False, "message": f"Failed to import save ZIP: {e}"}
+
+
 def restore_backup(base_dir: Path, zip_name: str) -> dict:
     """Restore savegame from selected backup zip."""
     bdir = get_backup_dir(base_dir)
@@ -114,8 +169,7 @@ def restore_backup(base_dir: Path, zip_name: str) -> dict:
                 except Exception:
                     pass
         sdir.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(zip_path, "r") as zf:
-            zf.extractall(sdir)
+        _safe_extract_zip(zip_path, sdir)
 
         return {"success": True, "message": f"Successfully restored saves from: {zip_name}"}
     except Exception as e:

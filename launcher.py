@@ -62,7 +62,71 @@ from config_manager import load_launcher_config, save_launcher_config, load_keyb
 import save_manager
 import trophy_manager
 import indo_patcher
+import auto_updater
+import session_tracker
+import ctypes
 import urllib.request
+
+CURRENT_VERSION = "v1.3.0-PC-Native"
+_HW_CACHE = None
+
+
+def _detect_hardware_summary() -> dict:
+    global _HW_CACHE
+    if _HW_CACHE is not None:
+        return _HW_CACHE
+    gpu_name = "Vulkan 1.3 GPU"
+    ram_gb = 0
+    if sys.platform == "win32":
+        try:
+            class MEMORYSTATUSEX(ctypes.Structure):
+                _fields_ = [
+                    ("dwLength", ctypes.c_ulong),
+                    ("dwMemoryLoad", ctypes.c_ulong),
+                    ("ullTotalPhys", ctypes.c_ulonglong),
+                    ("ullAvailPhys", ctypes.c_ulonglong),
+                    ("ullTotalPageFile", ctypes.c_ulonglong),
+                    ("ullAvailPageFile", ctypes.c_ulonglong),
+                    ("ullTotalVirtual", ctypes.c_ulonglong),
+                    ("ullAvailVirtual", ctypes.c_ulonglong),
+                    ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+                ]
+            mem = MEMORYSTATUSEX()
+            mem.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
+            if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(mem)):
+                ram_gb = int(round(mem.ullTotalPhys / (1024 ** 3)))
+        except Exception:
+            pass
+        try:
+            flags = 0x08000000
+            r = subprocess.run(
+                ["powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name) -join ' | '"],
+                capture_output=True, text=True, timeout=4, creationflags=flags
+            )
+            names = [n.strip() for n in (r.stdout or "").split("|") if n.strip()]
+            # Prefer discrete GPU (NVIDIA/AMD) over integrated Intel if both present
+            discrete = [n for n in names if any(k in n.upper() for k in ("NVIDIA", "RTX", "GTX", "RADEON", "RX "))]
+            if discrete:
+                gpu_name = discrete[0]
+            elif names:
+                gpu_name = names[0]
+        except Exception:
+            pass
+    _HW_CACHE = {"gpu": gpu_name, "ram_gb": ram_gb}
+    return _HW_CACHE
+
+
+def _get_shader_cache_mb() -> float:
+    total = 0
+    for d in (BIN_DIR / "user" / "shader", BIN_DIR / "user" / "cache"):
+        if d.is_dir():
+            for f in d.rglob("*"):
+                if f.is_file():
+                    try:
+                        total += f.stat().st_size
+                    except Exception:
+                        pass
+    return round(total / (1024 * 1024), 1)
 
 import webview
 
@@ -114,10 +178,14 @@ class LauncherAPI:
             "close_launcher_on_exit": self.ini_data.get("close_launcher_on_exit", "false"),
             "check_updates_startup": self.ini_data.get("check_updates_startup", "true"),
             "auto_install_updates": self.ini_data.get("auto_install_updates", "false"),
+            "auto_backup_saves": self.ini_data.get("auto_backup_saves", "true"),
             "language": self.ini_data.get("language", "id"),
             "theme": self.ini_data.get("theme", "dark"),
             "indo_patch": self.ini_data.get("indo_patch", "false"),
             "indo_patch_status": indo_patcher.get_indo_patch_status(self.game_dir, BASE_DIR, PATCHES_DIR),
+            "session_stats": session_tracker.get_formatted_stats(BASE_DIR),
+            "hardware": _detect_hardware_summary(),
+            "shader_cache_mb": _get_shader_cache_mb(),
             "player_name": self.ini_data.get("player_name", "AO Zero"),
             "app_ver": self.game_ver,
             "gamepad": c_name,
@@ -167,7 +235,11 @@ class LauncherAPI:
             
             self.game_info = get_game_info(self.game_dir)
             self.game_ver = self.game_info.get("APP_VER", "01.00")
-            return {"path": str(self.game_dir), "app_ver": self.game_ver}
+            return {
+                "path": str(self.game_dir),
+                "app_ver": self.game_ver,
+                "indo_patch_status": indo_patcher.get_indo_patch_status(self.game_dir, BASE_DIR, PATCHES_DIR),
+            }
         return None
 
     def browse_manual_pkg(self):
@@ -201,7 +273,10 @@ class LauncherAPI:
                 self.game_info = get_game_info(self.game_dir)
                 self.game_ver = self.game_info.get("APP_VER", "01.00")
                 cb(f"[SUCCESS] Game successfully updated to v{self.game_ver}!")
-                main_window.evaluate_js(f"document.getElementById('badgeVer').textContent = '● UPDATE v{self.game_ver}';")
+                main_window.evaluate_js(
+                    f"if(document.getElementById('badgeVer')) document.getElementById('badgeVer').textContent = 'v{self.game_ver}';"
+                    f"if(document.getElementById('kvVersion')) document.getElementById('kvVersion').textContent = '{self.game_ver} (CUSA17374)';"
+                )
             except Exception as e:
                 main_window.evaluate_js(f"window.onInstallLog('[ERROR] Installation failed: {str(e)}');")
 
@@ -236,11 +311,21 @@ class LauncherAPI:
             )
             return "NO_GAME"
 
+        if str(self.ini_data.get("auto_backup_saves", "true")).lower() == "true":
+            try:
+                ab = save_manager.auto_backup_saves(BASE_DIR, keep=5)
+                if ab.get("success") and main_window:
+                    main_window.evaluate_js(f"window.onInstallLog({json.dumps('[AUTO-BACKUP] ' + ab['message'])});")
+            except Exception:
+                pass
+
         if hide_launcher:
             main_window.hide()
 
         def runner():
             proc = None
+            t_start = time.time()
+            exit_code = 0
             try:
                 proc = launch_game(
                     game_dir=self.game_dir,
@@ -257,21 +342,24 @@ class LauncherAPI:
                     audio_volume=audio_volume
                 )
                 self.active_proc = proc
-                proc.wait()
+                exit_code = proc.wait()
             except Exception as err:
+                exit_code = 1
                 print(f"[LAUNCH ERROR] {err}")
                 if hide_launcher:
                     main_window.show()
                 main_window.evaluate_js(f"alert('Launch Failed: {str(err)}');")
             finally:
                 end_session(proc)
+                elapsed = time.time() - t_start
+                new_stats = session_tracker.record_session(BASE_DIR, elapsed, exit_code)
                 if close_on_exit:
                     main_window.destroy()
                     sys.exit(0)
                 else:
                     if hide_launcher:
                         main_window.show()
-                    main_window.evaluate_js("window.onGameExited();")
+                    main_window.evaluate_js(f"window.onGameExited({json.dumps(new_stats)}, {_get_shader_cache_mb()});")
 
         threading.Thread(target=runner, daemon=True).start()
         return "LAUNCHING"
@@ -358,6 +446,23 @@ class LauncherAPI:
     def open_saves_folder(self):
         return save_manager.open_saves_folder(BASE_DIR)
 
+    def import_save_zip(self):
+        global main_window
+        res = main_window.create_file_dialog(
+            webview.OPEN_DIALOG,
+            directory=str(BASE_DIR),
+            file_types=('Save Archive (*.zip)', '*.zip')
+        )
+        if res and len(res) > 0:
+            return save_manager.import_save_zip(BASE_DIR, Path(res[0]))
+        return {"success": False, "message": "Cancelled."}
+
+    def open_screenshots_folder(self):
+        sdir = BIN_DIR / "user" / "screenshots"
+        sdir.mkdir(parents=True, exist_ok=True)
+        os.startfile(str(sdir))
+        return "Opened screenshots folder."
+
     def get_trophies(self):
         return trophy_manager.load_trophies(BASE_DIR)
 
@@ -405,31 +510,30 @@ class LauncherAPI:
         return {"started": True}
 
     def check_updates(self):
-        current_version = "v1.2.0-PC-Native"
-        try:
-            req = urllib.request.Request(
-                "https://api.github.com/repos/ao-zero/kamen-rider-memory-of-heroes-pc/releases/latest",
-                headers={"User-Agent": "KR-Memory-of-Heroes-Launcher"}
-            )
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                data = json.loads(resp.read().decode())
-                latest_tag = data.get("tag_name", "v1.0.1")
-                is_latest = self._parse_version(latest_tag) <= self._parse_version(current_version)
-                return {
-                    "current": current_version,
-                    "latest": latest_tag,
-                    "up_to_date": is_latest,
-                    "url": data.get("html_url", "https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases"),
-                    "notes": data.get("body", "v1.0.1 Fanmade PC release.")
-                }
-        except Exception:
-            return {
-                "current": current_version,
-                "latest": current_version,
-                "up_to_date": True,
-                "url": "https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases",
-                "notes": "You are on the latest build."
-            }
+        return auto_updater.check_for_updates(CURRENT_VERSION)
+
+    def start_auto_update(self, download_url):
+        global main_window
+        if not download_url:
+            return {"started": False, "message": "No download URL provided."}
+
+        def worker():
+            def on_prog(pct, dl_mb, tot_mb, text):
+                if main_window:
+                    main_window.evaluate_js(f"window.onUpdateProgress({pct}, {json.dumps(text)});")
+
+            res = auto_updater.download_and_prepare_update(download_url, BASE_DIR, on_prog)
+            if main_window:
+                main_window.evaluate_js(f"window.onUpdateDone({json.dumps(res)});")
+            if res.get("success") and res.get("bat_path"):
+                time.sleep(1.0)
+                auto_updater.launch_updater_script(res["bat_path"])
+                if main_window:
+                    main_window.destroy()
+                os._exit(0)
+
+        threading.Thread(target=worker, daemon=True).start()
+        return {"started": True}
 
     def open_game_folder(self):
         if self.game_dir.is_dir():

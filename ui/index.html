@@ -83,14 +83,30 @@
     <section id="tab-play" class="tab-pane active">
       <div class="hero-banner">
         <div class="hero-top">
-          <div class="hero-crumb" id="footerStatus">CUSA17374 · PC Native Edition v1.2.0</div>
+          <div class="hero-crumb" id="footerStatus">CUSA17374 · PC Native Edition v1.3.0</div>
         </div>
         <div class="hero-bottom">
           <img src="assets/game_icon_rounded.png" alt="Cover" class="hero-poster">
           <div class="hero-text">
             <h1 class="hero-title">Kamen Rider: Memory of Heroes</h1>
-            <div class="hero-subtitle">Bandai Namco · <span id="badgeVer">v01.01</span> · Port by <strong id="lblPlayerName">AO Zero</strong> &amp; Bakka Sub</div>
+            <div class="hero-subtitle">Bandai Namco · <span id="badgeVer">v01.01</span> · <span id="heroPlaytimeMeta">0m played</span> · Port by <strong id="lblPlayerName">AO Zero</strong> &amp; Bakka Sub</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Auto-Update Available Banner (Hidden unless newer release exists) -->
+      <div id="updateBanner" class="update-banner">
+        <div class="update-banner-left">
+          <div class="update-banner-title" id="updateBannerTitle">New update available!</div>
+          <div class="update-banner-sub" id="updateBannerSub">Click Download &amp; Install to update automatically while keeping your game dump &amp; saves safe.</div>
+        </div>
+        <div class="update-banner-actions">
+          <button class="btn-secondary" style="height:32px;font-size:12px;" onclick="openUpdateReleasePage()">View Notes</button>
+          <button id="btnStartAutoUpdate" class="btn-primary" style="height:32px;padding:0 14px;font-size:12px;" onclick="startAutoUpdate()">Download &amp; Install</button>
+        </div>
+        <div id="updateProgressWrap" class="update-progress-wrap">
+          <div class="update-progress-track"><div id="updateProgressBar" class="update-progress-fill"></div></div>
+          <div id="updateProgressText" class="update-progress-text">Preparing download...</div>
         </div>
       </div>
 
@@ -163,8 +179,8 @@
               <button class="head-action red" onclick="clearShaderCache()" data-i18n="btn_clear_shader_short">Clear cache</button>
             </div>
             <div class="spec-row">
-              <span class="spec-label">State</span>
-              <span class="spec-value green">Ready · Async Pipelines</span>
+              <span class="spec-label">Shaders</span>
+              <span class="spec-value green" id="kvShaderSize">Ready · 0.0 MB cached</span>
               <span></span>
             </div>
             <div class="spec-row">
@@ -178,9 +194,9 @@
               <span></span>
             </div>
             <div class="spec-row">
-              <span class="spec-label">Saves</span>
-              <span class="spec-value">Portable User Folder</span>
-              <button class="head-action" onclick="openSavesFolder()">Open</button>
+              <span class="spec-label">Last run</span>
+              <span class="spec-value" id="kvLastRunResult">Ready to launch</span>
+              <button class="head-action" onclick="openScreenshotsFolder()">Screenshots</button>
             </div>
           </div>
 
@@ -396,6 +412,7 @@
         <div class="section-card">
           <div class="saves-action-bar">
             <button class="btn-primary" style="height:34px;font-size:12.5px;" onclick="backupSaves()" data-i18n="btn_backup_saves">Backup All Saves</button>
+            <button class="btn-secondary" style="height:34px;" onclick="importSaveZip()" data-i18n="btn_import_save">Import Save (.zip)...</button>
             <button class="btn-secondary" style="height:34px;" onclick="install100SavePreset()" data-i18n="btn_load_100">Load 100% Save Preset</button>
             <button class="btn-secondary" style="height:34px;" onclick="openSavesFolder()" data-i18n="btn_open_saves_folder">Open Saves Folder</button>
             <button class="btn-secondary" style="height:34px;" onclick="refreshSavesList()" data-i18n="btn_refresh">Refresh</button>
@@ -443,7 +460,10 @@
           <span class="subpage-title" data-i18n="tab_settings">Settings</span>
           <span class="subpage-desc">Graphics, Upscaling, Audio, Diagnostics &amp; Credits</span>
         </div>
-        <button class="btn-secondary" style="height:32px;" onclick="checkForUpdates()" data-i18n="btn_check_updates">Check for Updates</button>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="gpu-pill" id="gpuDetectedPill"><span>GPU</span> <strong id="lblDetectedGpu">Detecting...</strong></div>
+          <button class="btn-secondary" style="height:32px;" onclick="checkForUpdates()" data-i18n="btn_check_updates">Check for Updates</button>
+        </div>
       </div>
 
       <div class="cards-wrap">
@@ -534,6 +554,7 @@
             <label class="custom-checkbox-label"><input type="checkbox" id="chkFullscreen" onchange="onSettingChanged()"><span class="check-box-custom"></span><span data-i18n="chk_fullscreen">Fullscreen</span></label>
             <label class="custom-checkbox-label"><input type="checkbox" id="chkBorderless" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_borderless">Borderless window</span></label>
             <label class="custom-checkbox-label"><input type="checkbox" id="chkHideLauncher" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_hide_launcher">Hide launcher during gameplay</span></label>
+            <label class="custom-checkbox-label"><input type="checkbox" id="chkAutoBackup" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_auto_backup">Auto-backup saves before launching game (keeps last 5)</span></label>
             <label class="custom-checkbox-label"><input type="checkbox" id="chkUpdateStartup" onchange="onSettingChanged()" checked><span class="check-box-custom"></span><span data-i18n="chk_update_startup">Check for updates on startup</span></label>
           </div>
         </div>
@@ -556,7 +577,7 @@
             </div>
             <div class="form-field">
               <label class="field-label">Updates Status:</label>
-              <div id="updateStatusText" style="font-size:12px;color:var(--green-text);padding-top:8px;">● v1.2.0-PC-Native (Latest)</div>
+              <div id="updateStatusText" style="font-size:12px;color:var(--green-text);padding-top:8px;">● v1.3.0-PC-Native (Latest)</div>
             </div>
           </div>
         </div>
@@ -632,6 +653,7 @@
     </div>
   </div>
 
+  <div id="appToast" class="app-toast"></div>
   <audio id="trophyChime" src="assets/custom_trophy/trophy.wav" preload="auto"></audio>
   <script src="app.js"></script>
 </body>

@@ -969,6 +969,55 @@ body {
 .ps4-toast-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ps4-toast-desc { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
 
+/* Auto-Update Banner & Progress Bar */
+.update-banner {
+  display: none;
+  margin: 12px 28px 0 28px;
+  padding: 12px 16px;
+  border-radius: var(--radius-card);
+  background: var(--blue-soft);
+  border: 1px solid var(--blue);
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.update-banner.show { display: flex; }
+.update-banner-left { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 240px; }
+.update-banner-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.update-banner-sub { font-size: 11.5px; color: var(--text-secondary); }
+.update-banner-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.update-progress-wrap { width: 100%; display: none; flex-direction: column; gap: 5px; margin-top: 6px; }
+.update-progress-wrap.show { display: flex; }
+.update-progress-track { width: 100%; height: 6px; border-radius: 99px; background: var(--bg-pill); overflow: hidden; }
+.update-progress-fill { height: 100%; width: 0%; background: var(--blue); transition: width 0.15s ease; }
+.update-progress-text { font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); }
+
+/* Modern In-Launcher Toast Notification */
+.app-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  max-width: 380px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius-control);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  z-index: 10001;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.app-toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.app-toast.ok { border-left-color: var(--green-dot); }
+.app-toast.error { border-left-color: var(--red-text); }
+
 /* Responsive */
 @media (max-width: 920px) {
   .grid-2x2, .form-grid-2, .preset-button-grid, .community-grid, .tools-btn-grid { grid-template-columns: 1fr; }

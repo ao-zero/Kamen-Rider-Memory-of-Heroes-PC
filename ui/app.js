@@ -9,15 +9,23 @@
 const I18N = {
   id: {
     menu_header: "MAIN MENU",
-    tab_play: "Mulai Main",
+    tab_play: "Overview",
     tab_settings: "Pengaturan",
+    tab_controls: "Kontrol",
     tab_gamepad: "Kontrol Stik",
     tab_keyboard: "Keyboard & Mouse",
-    tab_saves: "Custom Save",
-    tab_pkg: "DLC & Update",
-    tab_achievements: "Prestasi (Trophy)",
+    tab_saves: "Saves",
+    tab_pkg: "Patch & DLC",
+    tab_achievements: "Trophy",
     tab_tools: "Alat & Update",
     tab_community: "Komunitas",
+    card_game: "GAME",
+    btn_verify_short: "Verifikasi",
+    btn_change_short: "Ubah",
+    btn_clear_shader_short: "Hapus cache",
+    lbl_autosaved: "Tersimpan otomatis",
+    btn_import_save: "Impor Save (.zip)...",
+    chk_auto_backup: "Auto-backup save sebelum main (simpan 5 terakhir)",
     system_ready: "Sistem Siap 60 FPS",
     port_lead: "Port Lead:",
     partner: "Partner:",
@@ -114,15 +122,23 @@ const I18N = {
   },
   en: {
     menu_header: "MAIN MENU",
-    tab_play: "Play",
+    tab_play: "Overview",
     tab_settings: "Settings",
+    tab_controls: "Controls",
     tab_gamepad: "Gamepad",
     tab_keyboard: "Keyboard",
     tab_saves: "Saves",
-    tab_pkg: "DLC & Patches",
-    tab_achievements: "Achievements",
+    tab_pkg: "Patch & DLC",
+    tab_achievements: "Trophies",
     tab_tools: "Tools",
     tab_community: "Community",
+    card_game: "GAME",
+    btn_verify_short: "Verify",
+    btn_change_short: "Change",
+    btn_clear_shader_short: "Clear cache",
+    lbl_autosaved: "Auto-saved",
+    btn_import_save: "Import Save (.zip)...",
+    chk_auto_backup: "Auto-backup saves before launching game (keeps last 5)",
     system_ready: "System Ready (60 FPS)",
     port_lead: "Port Lead:",
     partner: "Partner:",
@@ -417,9 +433,7 @@ window.onIndoPatchDone = function(res) {
   }
   if (res && res.message) {
     appendLog(`[PATCH-ID] ${res.message}`);
-    if (!res.success) {
-      alert(res.message);
-    }
+    showToast(res.message, res.success ? 'ok' : 'error');
   }
 };
 
@@ -438,10 +452,6 @@ function applyLanguage(lang, persist) {
     }
   });
 
-  // Update quick button flag
-  const flag = document.getElementById('langFlag');
-  if (flag) flag.textContent = lang === 'id' ? '🇮🇩' : '🇬🇧';
-  
   const label = document.getElementById('langLabel');
   if (label) label.textContent = lang === 'id' ? 'ID' : 'EN';
 
@@ -520,27 +530,70 @@ window.onGamepadChanged = function(name) {
   }
 };
 
-window.onGameExited = function() {
+window.onGameExited = function(newStats, cacheMb) {
   const btn = document.getElementById('btnLaunch');
   if (btn) {
     btn.disabled = false;
-    btn.querySelector('#txtLaunchBtn').textContent = I18N[currentLang].btn_play;
+    const lbl = btn.querySelector('#txtLaunchBtn');
+    if (lbl) lbl.textContent = I18N[currentLang].btn_play;
   }
-  const status = document.getElementById('footerStatus');
-  if (status) status.textContent = "STATUS: READY TO PLAY (60 FPS NATIVE)";
+  const badge = document.getElementById('gameReadyText');
+  if (badge) badge.textContent = 'Shaders ready';
   const dot = document.getElementById('statusDot');
-  if (dot) dot.style.background = "#10B981";
+  if (dot) dot.style.background = 'var(--green-dot)';
+  if (newStats) renderSessionStats(newStats);
+  if (typeof cacheMb === 'number') renderShaderCache(cacheMb);
+  refreshSavesList();
 };
+
+let appToastTimer = null;
+function showToast(msg, type = 'ok') {
+  const el = document.getElementById('appToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `app-toast show ${type}`;
+  if (appToastTimer) clearTimeout(appToastTimer);
+  appToastTimer = setTimeout(() => {
+    el.classList.remove('show');
+  }, 3600);
+}
+
+function renderSessionStats(stats) {
+  if (!stats) return;
+  const heroMeta = document.getElementById('heroPlaytimeMeta');
+  if (heroMeta) {
+    heroMeta.textContent = stats.sessions > 0
+      ? `${stats.playtime_text} · last played ${stats.last_played_text}`
+      : stats.playtime_text;
+  }
+  const lastRun = document.getElementById('kvLastRunResult');
+  if (lastRun) lastRun.textContent = stats.last_result || 'Ready to launch';
+}
+
+function renderHardwareSummary(hw) {
+  const el = document.getElementById('lblDetectedGpu');
+  if (!el || !hw) return;
+  const ram = hw.ram_gb ? ` · ${hw.ram_gb} GB RAM` : '';
+  el.textContent = `${hw.gpu || 'Vulkan 1.3 GPU'}${ram}`;
+}
+
+function renderShaderCache(mb) {
+  const el = document.getElementById('kvShaderSize');
+  if (!el) return;
+  const val = (typeof mb === 'number' && !isNaN(mb)) ? mb.toFixed(1) : '0.0';
+  el.textContent = `Ready · ${val} MB cached`;
+}
 
 // ==========================================================================
 // INITIALIZATION
 // ==========================================================================
-function initLauncher() {
-  if (initStarted) return; // guard against DOMContentLoaded + pywebviewready firing twice
+function initLauncher(forceReload = false) {
+  if (initStarted && !forceReload) return;
   if (window.pywebview && window.pywebview.api) {
     initStarted = true;
+    initDone = false;
     window.pywebview.api.get_initial_data().then(data => {
-      // 1. Language & Theme (do NOT persist yet: settings controls are still at HTML defaults)
+      // 1. Language, Theme & Patch Status
       if (data.language) {
         applyLanguage(data.language, false);
       }
@@ -548,6 +601,9 @@ function initLauncher() {
       if (data.indo_patch_status) {
         updateIndoPatchUI(data.indo_patch_status);
       }
+      if (data.session_stats) renderSessionStats(data.session_stats);
+      if (data.hardware) renderHardwareSummary(data.hardware);
+      if (typeof data.shader_cache_mb === 'number') renderShaderCache(data.shader_cache_mb);
 
       // 2. Paths & Player Name
       document.getElementById('inputGameDir').value = data.game_dir || '';
@@ -575,6 +631,8 @@ function initLauncher() {
       document.getElementById('chkShowPerfHud').checked = (data.show_perf_hud === 'true' || data.show_perf_hud === true);
       document.getElementById('chkCompileShaders').checked = (data.compile_shaders_bg === 'true' || data.compile_shaders_bg === true || data.compile_shaders_bg === undefined);
       document.getElementById('chkHideLauncher').checked = (data.hide_launcher_on_play === 'true' || data.hide_launcher_on_play === true);
+      const chkAB = document.getElementById('chkAutoBackup');
+      if (chkAB) chkAB.checked = (data.auto_backup_saves === 'true' || data.auto_backup_saves === true || data.auto_backup_saves === undefined);
       document.getElementById('chkUpdateStartup').checked = (data.check_updates_startup === 'true' || data.check_updates_startup === true || data.check_updates_startup === undefined);
       
       const vol = data.audio_volume || '100';
@@ -645,6 +703,7 @@ function onSettingChanged() {
     show_perf_hud: document.getElementById('chkShowPerfHud').checked,
     compile_shaders_bg: document.getElementById('chkCompileShaders').checked,
     hide_launcher_on_play: document.getElementById('chkHideLauncher').checked,
+    auto_backup_saves: document.getElementById('chkAutoBackup') ? document.getElementById('chkAutoBackup').checked : true,
     check_updates_startup: document.getElementById('chkUpdateStartup').checked,
     audio_volume: document.getElementById('rngVolume').value,
     language: currentLang,
@@ -692,11 +751,22 @@ function browseGameDir() {
     window.pywebview.api.browse_game_dir().then(res => {
       if (res && res.path) {
         document.getElementById('inputGameDir').value = res.path;
+        const dirDisp = document.getElementById('lblGameDirDisplay');
+        if (dirDisp) {
+          dirDisp.textContent = res.path;
+          dirDisp.title = res.path;
+        }
         if (res.app_ver) {
-          document.getElementById('badgeVer').textContent = `● UPDATE v${res.app_ver}`;
-          document.getElementById('gameReadyText').textContent = `Ready: CUSA17374 v${res.app_ver} (PS4 Base Game Dump)`;
+          const bv = document.getElementById('badgeVer');
+          if (bv) bv.textContent = `v${res.app_ver}`;
+          const kv = document.getElementById('kvVersion');
+          if (kv) kv.textContent = `${res.app_ver} (CUSA17374)`;
+        }
+        if (res.indo_patch_status) {
+          updateIndoPatchUI(res.indo_patch_status);
         }
         appendLog(`[DIRECTORY] Game folder set to: ${res.path}`);
+        showToast('Game folder updated!', 'ok');
       }
     });
   }
@@ -705,12 +775,13 @@ function browseGameDir() {
 function launchGame() {
   const btn = document.getElementById('btnLaunch');
   btn.disabled = true;
-  btn.querySelector('#txtLaunchBtn').textContent = "HENSHIN IN PROGRESS...";
+  const lbl = btn.querySelector('#txtLaunchBtn');
+  if (lbl) lbl.textContent = 'Running...';
 
-  const status = document.getElementById('footerStatus');
-  if (status) status.textContent = "STATUS: GAME EXECUTING NATIVE (60 FPS)...";
+  const badge = document.getElementById('gameReadyText');
+  if (badge) badge.textContent = 'Game running';
   const dot = document.getElementById('statusDot');
-  if (dot) dot.style.background = "#D8F800";
+  if (dot) dot.style.background = 'var(--amber-text)';
 
   onSettingChanged();
 
@@ -720,7 +791,7 @@ function launchGame() {
         window.onGameExited();
       }
     }).catch(err => {
-      alert("Launch Error: " + err);
+      showToast("Launch Error: " + err, 'error');
       window.onGameExited();
     });
   }
@@ -785,10 +856,28 @@ function refreshSavesList() {
 function backupSaves() {
   if (window.pywebview && window.pywebview.api) {
     window.pywebview.api.backup_saves().then(res => {
-      alert(res.message);
+      showToast(res.message, res.success ? 'ok' : 'error');
       appendLog(`[BACKUP] ${res.message}`);
       refreshSavesList();
     });
+  }
+}
+
+function importSaveZip() {
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.import_save_zip().then(res => {
+      if (res && res.message && res.message !== 'Cancelled.') {
+        showToast(res.message, res.success ? 'ok' : 'error');
+        appendLog(`[SAVE IMPORT] ${res.message}`);
+        if (res.success) refreshSavesList();
+      }
+    });
+  }
+}
+
+function openScreenshotsFolder() {
+  if (window.pywebview && window.pywebview.api) {
+    window.pywebview.api.open_screenshots_folder().then(msg => showToast(msg, 'ok'));
   }
 }
 
@@ -954,30 +1043,75 @@ function filterTrophies(type, btn) {
 }
 
 // ==========================================================================
-// AUTO UPDATER & LOGS
+// AUTO UPDATER & LOGS (True 1-Click Download & Self-Replace)
 // ==========================================================================
+let latestUpdateMeta = null;
+let autoUpdateRunning = false;
+
 function checkForUpdates(silent) {
   const status = document.getElementById('updateStatusText');
   if (status) status.textContent = "Checking GitHub Releases...";
   
   if (window.pywebview && window.pywebview.api) {
     window.pywebview.api.check_updates().then(res => {
+      latestUpdateMeta = res;
       if (res.up_to_date) {
-        if (status) status.textContent = `● You are running the latest version (${res.current})`;
-        if (!silent) alert(`You are up to date! Installed: ${res.current}`);
+        if (status) status.textContent = `● Up to date (${res.current})`;
+        if (!silent) showToast(`You are up to date (${res.current})`, 'ok');
       } else {
-        if (status) status.textContent = `● New update available: ${res.latest}`;
-        if (!silent) {
-          if (confirm(`New update available: ${res.latest}\nWould you like to open the GitHub Releases page?`)) {
-            window.pywebview.api.open_external(res.url);
-          }
-        }
+        const sz = res.asset_size_mb ? ` (${res.asset_size_mb} MB)` : '';
+        if (status) status.textContent = `● Update available: ${res.latest}${sz}`;
+        const banner = document.getElementById('updateBanner');
+        const bTitle = document.getElementById('updateBannerTitle');
+        const bSub = document.getElementById('updateBannerSub');
+        const bBtn = document.getElementById('btnStartAutoUpdate');
+        if (bTitle) bTitle.textContent = `Update available: ${res.latest}${sz}`;
+        if (bSub) bSub.textContent = `Installed: ${res.current} → Latest: ${res.latest}. Your CUSA17374 dump, saves, and settings stay untouched.`;
+        if (bBtn) bBtn.style.display = res.download_url ? 'inline-flex' : 'none';
+        if (banner) banner.classList.add('show');
+        if (!silent) showToast(`Update available: ${res.latest}! Check Overview banner to install.`, 'ok');
       }
     }).catch(() => {
-      if (status) status.textContent = '● Could not reach the update server.';
+      if (status) status.textContent = '● Could not reach update server.';
     });
   }
 }
+
+function openUpdateReleasePage() {
+  const url = (latestUpdateMeta && latestUpdateMeta.url) || 'https://github.com/ao-zero/Kamen-Rider-Memory-of-Heroes-PC/releases';
+  openExternal(url);
+}
+
+function startAutoUpdate() {
+  if (autoUpdateRunning || !latestUpdateMeta || !latestUpdateMeta.download_url) return;
+  if (!confirm(`Download and install ${latestUpdateMeta.latest} now?\n\nThe launcher will restart automatically. Your CUSA17374 game dump, saves, and launcher.ini will NOT be modified.`)) {
+    return;
+  }
+  autoUpdateRunning = true;
+  const btn = document.getElementById('btnStartAutoUpdate');
+  const pWrap = document.getElementById('updateProgressWrap');
+  if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
+  if (pWrap) pWrap.classList.add('show');
+  window.pywebview.api.start_auto_update(latestUpdateMeta.download_url);
+}
+
+window.onUpdateProgress = function(pct, text) {
+  const bar = document.getElementById('updateProgressBar');
+  const lbl = document.getElementById('updateProgressText');
+  if (bar) bar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+  if (lbl) lbl.textContent = `${pct}% · ${text}`;
+};
+
+window.onUpdateDone = function(res) {
+  autoUpdateRunning = false;
+  if (res && res.success) {
+    showToast(res.message || 'Update ready! Restarting...', 'ok');
+  } else {
+    showToast((res && res.message) || 'Auto-update failed.', 'error');
+    const btn = document.getElementById('btnStartAutoUpdate');
+    if (btn) { btn.disabled = false; btn.textContent = 'Retry Update'; }
+  }
+};
 
 function openLastRunLog() {
   if (window.pywebview && window.pywebview.api) {
@@ -1031,9 +1165,9 @@ function cleanTempFiles() {
 function importSettings() {
   if (window.pywebview && window.pywebview.api) {
     window.pywebview.api.import_settings().then(res => {
-      alert(res.message);
+      showToast(res.message, res.success ? 'ok' : 'error');
       if (res.success) {
-        initLauncher();
+        initLauncher(true);
       }
     });
   }
@@ -1043,9 +1177,9 @@ function resetAllSettings() {
   if (confirm("Reset ALL launcher graphics profiles, settings, and keybinds to factory default?")) {
     if (window.pywebview && window.pywebview.api) {
       window.pywebview.api.reset_all_settings().then(msg => {
-        alert(msg);
+        showToast(msg, 'ok');
         appendLog(`[RESET] ${msg}`);
-        initLauncher();
+        initLauncher(true);
       });
     }
   }
@@ -1053,13 +1187,17 @@ function resetAllSettings() {
 
 function clearShaderCache() {
   if (window.pywebview && window.pywebview.api) {
-    window.pywebview.api.clear_shader_cache().then(msg => alert(msg));
+    window.pywebview.api.clear_shader_cache().then(msg => {
+      showToast(msg, 'ok');
+      renderShaderCache(0);
+      appendLog(`[CACHE] ${msg}`);
+    });
   }
 }
 
 function createDesktopShortcut() {
   if (window.pywebview && window.pywebview.api) {
-    window.pywebview.api.create_desktop_shortcut().then(msg => alert(msg));
+    window.pywebview.api.create_desktop_shortcut().then(msg => showToast(msg, 'ok'));
   }
 }
 

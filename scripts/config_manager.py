@@ -49,6 +49,7 @@ DEFAULT_CONFIG = {
     "close_launcher_on_exit": "false",
     "check_updates_startup": "true",
     "auto_install_updates": "false",
+    "auto_backup_saves": "true",
     "language": "id",
     "theme": "dark",
     "indo_patch": "false",
@@ -119,7 +120,7 @@ def load_launcher_config() -> dict:
         result["upscaler"] = upscaler_aliases[result["upscaler"]]
     for bool_key in ("fullscreen", "borderless", "show_fps", "show_perf_hud", "compile_shaders_bg",
                      "hide_launcher_on_play", "close_launcher_on_exit", "check_updates_startup",
-                     "auto_install_updates", "indo_patch"):
+                     "auto_install_updates", "auto_backup_saves", "indo_patch"):
         result[bool_key] = str(result.get(bool_key, DEFAULT_CONFIG[bool_key])).strip().lower()
 
     return result
