@@ -57,6 +57,11 @@ def _read_u_str(buf: bytes, off: int):
 
 
 def _write_u_str(out: bytearray, s: str):
+    # Ensure no literal \n or \N slips into Unity text (must be real 0x0A newline)
+    if "\\n" in s:
+        s = s.replace("\\n", "\n")
+    if "\\N" in s:
+        s = s.replace("\\N", "\n")
     raw = s.encode("utf-8")
     out += struct.pack("<I", len(raw))
     out += raw
