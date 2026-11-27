@@ -245,6 +245,8 @@ class PerfOverlay:
         user32.GetWindowTextLengthW.argtypes = [wintypes.HWND]
         user32.GetWindowTextLengthW.restype = ctypes.c_int
         user32.GetForegroundWindow.restype = wintypes.HWND
+        user32.SetWindowRgn.argtypes = [wintypes.HWND, wintypes.HRGN, wintypes.BOOL]
+        user32.SetWindowRgn.restype = ctypes.c_int
         user32.BeginPaint.argtypes = [wintypes.HWND, ctypes.POINTER(_PAINTSTRUCT)]
         user32.BeginPaint.restype = wintypes.HDC
         user32.EndPaint.argtypes = [wintypes.HWND, ctypes.POINTER(_PAINTSTRUCT)]
@@ -255,6 +257,12 @@ class PerfOverlay:
         kernel32.GetModuleHandleW.restype = wintypes.HMODULE
         gdi32.CreateSolidBrush.argtypes = [wintypes.COLORREF]
         gdi32.CreateSolidBrush.restype = wintypes.HBRUSH
+        gdi32.CreatePen.argtypes = [ctypes.c_int, ctypes.c_int, wintypes.COLORREF]
+        gdi32.CreatePen.restype = wintypes.HPEN
+        gdi32.CreateRoundRectRgn.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+        gdi32.CreateRoundRectRgn.restype = wintypes.HRGN
+        gdi32.RoundRect.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+        gdi32.RoundRect.restype = wintypes.BOOL
         gdi32.CreateFontW.restype = wintypes.HFONT
         gdi32.SetBkMode.argtypes = [wintypes.HDC, ctypes.c_int]
         gdi32.SelectObject.argtypes = [wintypes.HDC, wintypes.HGDIOBJ]
@@ -265,19 +273,22 @@ class PerfOverlay:
         mon = _SystemMonitor(game_pid=getattr(self.proc, "pid", 0))
         t_start = time.time()
 
-        hdr_text = "KR PERF HUD  00:00"
-        body_text = (
-            "CPU  : --%\n"
-            "GPU  : Detecting...\n"
-            "RAM  : -- / -- GB\n"
-            "GAME : -- MB\n"
-            f"MODE : {self.res_short} | {self.fps_short}"
-        )
+        HUD_W, HUD_H = 236, 118
+        rows = [
+            ("CPU", "--%"),
+            ("GPU", "Detecting..."),
+            ("RAM", "-- / -- GB"),
+            ("Game", "-- MB"),
+            ("Mode", f"{self.res_short} · {self.fps_short}"),
+        ]
+        timer_str = "00:00"
 
-        bg_brush = gdi32.CreateSolidBrush(0x0014100D)       # BGR #0D1014
-        border_brush = gdi32.CreateSolidBrush(0x003C312A)   # BGR #2A313C
-        font_hdr = gdi32.CreateFontW(-13, 0, 0, 0, 700, 0, 0, 0, 1, 0, 0, 5, 0x31, "Consolas")
-        font_body = gdi32.CreateFontW(-12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 5, 0x31, "Consolas")
+        # Match the engine FPS pill: dark matte #121315 + subtle gray border #45484E + Segoe UI
+        bg_brush = gdi32.CreateSolidBrush(0x00151312)       # BGR #121315
+        border_pen = gdi32.CreatePen(0, 1, 0x004E4845)      # BGR #45484E
+        font_hdr = gdi32.CreateFontW(-13, 0, 0, 0, 600, 0, 0, 0, 1, 0, 0, 5, 0, "Segoe UI")
+        font_lbl = gdi32.CreateFontW(-12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 5, 0, "Segoe UI")
+        font_val = gdi32.CreateFontW(-12, 0, 0, 0, 600, 0, 0, 0, 1, 0, 0, 5, 0, "Segoe UI")
 
         WM_PAINT = 0x000F
         WM_TIMER = 0x0113
@@ -315,7 +326,7 @@ class PerfOverlay:
         tick_count = 0
 
         def wnd_proc(hwnd, msg, wparam, lparam):
-            nonlocal hdr_text, body_text, tick_count
+            nonlocal rows, timer_str, tick_count
             if msg == WM_TIMER:
                 if self._stop_evt.is_set() or (self.proc is not None and self.proc.poll() is not None):
                     user32.DestroyWindow(hwnd)
@@ -345,34 +356,49 @@ class PerfOverlay:
                     cpu = mon.get_cpu_percent()
                     r_used, r_tot, r_pct = mon.get_ram_info()
                     g_mb = mon.get_game_ram_mb()
-                    hdr_text = f"KR PERF HUD  {mm:02d}:{ss:02d}"
-                    body_text = (
-                        f"CPU  : {cpu:4.1f}%\n"
-                        f"GPU  : {mon._gpu_text}\n"
-                        f"RAM  : {r_used:.1f}/{r_tot:.0f} GB ({r_pct}%)\n"
-                        f"GAME : {g_mb:,.0f} MB\n"
-                        f"MODE : {self.res_short} | {self.fps_short}"
-                    )
+                    timer_str = f"{mm:02d}:{ss:02d}"
+                    rows = [
+                        ("CPU", f"{cpu:.1f}%"),
+                        ("GPU", mon._gpu_text.replace(" | ", " · ")),
+                        ("RAM", f"{r_used:.1f} / {r_tot:.0f} GB ({r_pct}%)"),
+                        ("Game", f"{g_mb:,.0f} MB"),
+                        ("Mode", f"{self.res_short} · {self.fps_short}"),
+                    ]
                     user32.InvalidateRect(hwnd, None, True)
                 return 0
             elif msg == WM_PAINT:
                 ps = _PAINTSTRUCT()
                 hdc = user32.BeginPaint(hwnd, ctypes.byref(ps))
                 if hdc:
-                    rc = wintypes.RECT(0, 0, 260, 114)
-                    user32.FillRect(hdc, ctypes.byref(rc), bg_brush)
-                    user32.FrameRect(hdc, ctypes.byref(rc), border_brush)
+                    gdi32.SelectObject(hdc, bg_brush)
+                    gdi32.SelectObject(hdc, border_pen)
+                    gdi32.RoundRect(hdc, 0, 0, HUD_W, HUD_H, 16, 16)
                     gdi32.SetBkMode(hdc, 1)  # TRANSPARENT
 
+                    # Header row: subtle title left, timer right
                     gdi32.SelectObject(hdc, font_hdr)
-                    gdi32.SetTextColor(hdc, 0x0080DE4A)  # BGR #4ADE80 (green)
-                    r_hdr = wintypes.RECT(10, 8, 250, 26)
-                    user32.DrawTextW(hdc, hdr_text, -1, ctypes.byref(r_hdr), 0)
+                    gdi32.SetTextColor(hdc, 0x00EFECE9)  # crisp white
+                    r_hdr = wintypes.RECT(12, 8, HUD_W - 56, 26)
+                    user32.DrawTextW(hdc, "Performance", -1, ctypes.byref(r_hdr), 0)
 
-                    gdi32.SelectObject(hdc, font_body)
-                    gdi32.SetTextColor(hdc, 0x00F3EDE6)  # BGR #E6EDF3 (off-white)
-                    r_body = wintypes.RECT(10, 28, 250, 108)
-                    user32.DrawTextW(hdc, body_text, -1, ctypes.byref(r_body), 0)
+                    gdi32.SelectObject(hdc, font_lbl)
+                    gdi32.SetTextColor(hdc, 0x00A6A19B)  # muted gray
+                    r_tm = wintypes.RECT(HUD_W - 54, 9, HUD_W - 12, 26)
+                    user32.DrawTextW(hdc, timer_str, -1, ctypes.byref(r_tm), 0x0002)  # DT_RIGHT
+
+                    # Metric rows
+                    y = 28
+                    for lbl, val in rows:
+                        gdi32.SelectObject(hdc, font_lbl)
+                        gdi32.SetTextColor(hdc, 0x00A6A19B)
+                        r_l = wintypes.RECT(12, y, 56, y + 17)
+                        user32.DrawTextW(hdc, lbl, -1, ctypes.byref(r_l), 0)
+
+                        gdi32.SelectObject(hdc, font_val)
+                        gdi32.SetTextColor(hdc, 0x00EFECE9)
+                        r_v = wintypes.RECT(56, y, HUD_W - 12, y + 17)
+                        user32.DrawTextW(hdc, val, -1, ctypes.byref(r_v), 0x0002)  # DT_RIGHT
+                        y += 16
 
                     user32.EndPaint(hwnd, ctypes.byref(ps))
                 return 0
@@ -399,13 +425,18 @@ class PerfOverlay:
             ws_popup = 0x80000000
             hwnd = user32.CreateWindowExW(
                 ex_style, cls_name, "KR Perf HUD", ws_popup,
-                16, 16, 260, 114, None, None, hinst, None
+                16, 16, HUD_W, HUD_H, None, None, hinst, None
             )
             if not hwnd:
                 return
 
-            # 85% opacity (217/255); start hidden until game window appears if tracking a PID
-            user32.SetLayeredWindowAttributes(hwnd, 0, 217, 0x00000002)
+            # Apply smooth rounded window region matching the FPS counter pill
+            rgn = gdi32.CreateRoundRectRgn(0, 0, HUD_W + 1, HUD_H + 1, 16, 16)
+            if rgn:
+                user32.SetWindowRgn(hwnd, rgn, True)
+
+            # 86% opacity (220/255); start hidden until game window appears if tracking a PID
+            user32.SetLayeredWindowAttributes(hwnd, 0, 220, 0x00000002)
             if not game_pid:
                 user32.ShowWindow(hwnd, SW_SHOWNOACTIVATE)
                 user32.UpdateWindow(hwnd)
@@ -419,7 +450,7 @@ class PerfOverlay:
             print(f"[PERF HUD] Win32 overlay notice: {e}")
         finally:
             mon.stop()
-            for obj in (bg_brush, border_brush, font_hdr, font_body):
+            for obj in (bg_brush, border_pen, font_hdr, font_lbl, font_val):
                 try:
                     gdi32.DeleteObject(obj)
                 except Exception:
