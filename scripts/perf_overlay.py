@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """
-Lightweight Click-Through Real-Time Performance HUD Overlay (MangoHud-style)
+Pure-Win32 Click-Through Real-Time Performance HUD Overlay (Zero Dependencies)
 for Kamen Rider: Memory of Heroes — PC Native Edition.
 
-Displays live CPU %, GPU % / Temp / VRAM, System RAM, Game Process RAM,
-and Session Timer in a compact top-left corner overlay when FPS Overlay is
-set to "Detailed". Zero external pip dependencies (pure Win32 ctypes + tkinter).
+Uses native Win32 CreateWindowExW + GDI DrawTextW + SetLayeredWindowAttributes.
+No tkinter / Tcl/Tk required — works 100% reliably inside PyInstaller .exe!
+Displays live CPU %, GPU % / Temp / VRAM, System RAM, Game RAM, and Session Timer.
 """
 
 import ctypes
+import os
 import subprocess
 import sys
 import threading
@@ -46,6 +47,37 @@ class _PROCESS_MEMORY_COUNTERS(ctypes.Structure):
         ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
         ("PagefileUsage", ctypes.c_size_t),
         ("PeakPagefileUsage", ctypes.c_size_t),
+    ]
+
+
+class _PAINTSTRUCT(ctypes.Structure):
+    _fields_ = [
+        ("hdc", wintypes.HDC),
+        ("fErase", wintypes.BOOL),
+        ("rcPaint", wintypes.RECT),
+        ("fRestore", wintypes.BOOL),
+        ("fIncUpdate", wintypes.BOOL),
+        ("rgbReserved", ctypes.c_byte * 32),
+    ]
+
+
+WNDPROC = ctypes.WINFUNCTYPE(ctypes.c_longlong, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
+
+
+class _WNDCLASSEXW(ctypes.Structure):
+    _fields_ = [
+        ("cbSize", wintypes.UINT),
+        ("style", wintypes.UINT),
+        ("lpfnWndProc", WNDPROC),
+        ("cbClsExtra", ctypes.c_int),
+        ("cbWndExtra", ctypes.c_int),
+        ("hInstance", wintypes.HINSTANCE),
+        ("hIcon", wintypes.HICON),
+        ("hCursor", wintypes.HCURSOR),
+        ("hbrBackground", wintypes.HBRUSH),
+        ("lpszMenuName", wintypes.LPCWSTR),
+        ("lpszClassName", wintypes.LPCWSTR),
+        ("hIconSm", wintypes.HICON),
     ]
 
 
@@ -106,9 +138,7 @@ class _SystemMonitor:
     def get_game_ram_mb(self) -> float:
         if sys.platform != "win32" or not self.game_pid:
             return 0.0
-        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-        PROCESS_VM_READ = 0x0010
-        h = ctypes.windll.kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, False, self.game_pid)
+        h = ctypes.windll.kernel32.OpenProcess(0x1010, False, self.game_pid)
         if not h:
             return 0.0
         try:
@@ -142,8 +172,10 @@ class _SystemMonitor:
                     if r.returncode == 0 and r.stdout.strip():
                         parts = [p.strip() for p in r.stdout.strip().splitlines()[0].split(",")]
                         if len(parts) >= 4:
-                            util, temp, v_used, v_tot = parts[0], parts[1], float(parts[2]) / 1024.0, float(parts[3]) / 1024.0
-                            self._gpu_text = f"{util}% · {temp}°C · {v_used:.1f}/{v_tot:.1f} GB"
+                            util, temp = parts[0], parts[1]
+                            v_used = float(parts[2]) / 1024.0
+                            v_tot = float(parts[3]) / 1024.0
+                            self._gpu_text = f"{util}% | {temp}C | {v_used:.1f}/{v_tot:.1f} GB"
                     else:
                         nvidia_ok = False
                 except Exception:
@@ -155,7 +187,7 @@ class _SystemMonitor:
 
 
 class PerfOverlay:
-    """Non-blocking, click-through transparent corner HUD attached to a game process."""
+    """Pure-Win32 non-blocking, click-through transparent corner HUD."""
 
     def __init__(self, proc, resolution: str = "1080p", fps: str = "60 FPS"):
         self.proc = proc
@@ -167,98 +199,139 @@ class PerfOverlay:
     def start(self):
         if sys.platform != "win32":
             return
-        self._thread = threading.Thread(target=self._run_ui, daemon=True)
+        self._thread = threading.Thread(target=self._run_win32, daemon=True)
         self._thread.start()
 
     def stop(self):
         self._stop_evt.set()
 
-    def _run_ui(self):
-        try:
-            import tkinter as tk
-        except Exception:
-            return
+    def _run_win32(self):
+        user32 = ctypes.windll.user32
+        gdi32 = ctypes.windll.gdi32
+        kernel32 = ctypes.windll.kernel32
+
+        user32.DefWindowProcW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+        user32.DefWindowProcW.restype = ctypes.c_longlong
+        kernel32.GetModuleHandleW.restype = wintypes.HMODULE
+        gdi32.CreateSolidBrush.restype = wintypes.HBRUSH
+        gdi32.CreateFontW.restype = wintypes.HFONT
 
         mon = _SystemMonitor(game_pid=getattr(self.proc, "pid", 0))
         t_start = time.time()
 
-        try:
-            root = tk.Tk()
-            root.overrideredirect(True)
-            root.attributes("-topmost", True)
-            root.attributes("-alpha", 0.84)
-            root.configure(bg="#0D1014")
-            root.geometry("+14+14")
+        hdr_text = "KR PERF HUD  00:00"
+        body_text = (
+            "CPU  : --%\n"
+            "GPU  : Detecting...\n"
+            "RAM  : -- / -- GB\n"
+            "GAME : -- MB\n"
+            f"MODE : {self.res_short} | {self.fps_short}"
+        )
 
-            # Make window click-through, non-focusable, and hidden from Alt+Tab/Taskbar
-            root.update_idletasks()
-            hwnd = ctypes.windll.user32.GetParent(root.winfo_id()) or root.winfo_id()
-            GWL_EXSTYLE = -20
-            WS_EX_LAYERED = 0x00080000
-            WS_EX_TRANSPARENT = 0x00000020
-            WS_EX_TOOLWINDOW = 0x00000080
-            WS_EX_NOACTIVATE = 0x08000000
-            ex = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
-            ctypes.windll.user32.SetWindowLongW(
-                hwnd, GWL_EXSTYLE, ex | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
-            )
+        bg_brush = gdi32.CreateSolidBrush(0x0014100D)       # BGR #0D1014
+        border_brush = gdi32.CreateSolidBrush(0x003C312A)   # BGR #2A313C
+        font_hdr = gdi32.CreateFontW(-13, 0, 0, 0, 700, 0, 0, 0, 1, 0, 0, 5, 0x31, "Consolas")
+        font_body = gdi32.CreateFontW(-12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 5, 0x31, "Consolas")
 
-            frame = tk.Frame(root, bg="#0D1014", highlightbackground="#2A313C", highlightthickness=1, padx=10, pady=7)
-            frame.pack()
+        WM_PAINT = 0x000F
+        WM_TIMER = 0x0113
+        WM_DESTROY = 0x0002
+        HWND_TOPMOST = -1
+        SWP_NOMOVE = 0x0002
+        SWP_NOSIZE = 0x0001
+        SWP_NOACTIVATE = 0x0010
 
-            lbl_hdr = tk.Label(
-                frame,
-                text="● KR PERF HUD  00:00",
-                fg="#4ADE80",
-                bg="#0D1014",
-                font=("Consolas", 9, "bold"),
-                anchor="w",
-            )
-            lbl_hdr.pack(fill="x")
-
-            lbl_body = tk.Label(
-                frame,
-                text="CPU   : --%\nGPU   : Detecting...\nRAM   : -- / -- GB\nGAME  : -- MB\nMODE  : " + f"{self.res_short} · {self.fps_short}",
-                fg="#E6EDF3",
-                bg="#0D1014",
-                font=("Consolas", 9),
-                justify="left",
-                anchor="w",
-            )
-            lbl_body.pack(fill="x", pady=(3, 0))
-
-            def refresh():
+        def wnd_proc(hwnd, msg, wparam, lparam):
+            nonlocal hdr_text, body_text
+            if msg == WM_TIMER:
                 if self._stop_evt.is_set() or (self.proc is not None and self.proc.poll() is not None):
-                    mon.stop()
-                    try:
-                        root.destroy()
-                    except Exception:
-                        pass
-                    return
-
+                    user32.DestroyWindow(hwnd)
+                    return 0
                 elapsed = int(time.time() - t_start)
                 mm, ss = divmod(elapsed, 60)
                 cpu = mon.get_cpu_percent()
                 r_used, r_tot, r_pct = mon.get_ram_info()
                 g_mb = mon.get_game_ram_mb()
-
-                lbl_hdr.config(text=f"● KR PERF HUD  {mm:02d}:{ss:02d}")
-                lbl_body.config(
-                    text=(
-                        f"CPU   : {cpu:4.1f}%\n"
-                        f"GPU   : {mon._gpu_text}\n"
-                        f"RAM   : {r_used:.1f}/{r_tot:.0f} GB ({r_pct}%)\n"
-                        f"GAME  : {g_mb:,.0f} MB\n"
-                        f"MODE  : {self.res_short} · {self.fps_short}"
-                    )
+                hdr_text = f"KR PERF HUD  {mm:02d}:{ss:02d}"
+                body_text = (
+                    f"CPU  : {cpu:4.1f}%\n"
+                    f"GPU  : {mon._gpu_text}\n"
+                    f"RAM  : {r_used:.1f}/{r_tot:.0f} GB ({r_pct}%)\n"
+                    f"GAME : {g_mb:,.0f} MB\n"
+                    f"MODE : {self.res_short} | {self.fps_short}"
                 )
-                # Keep topmost without stealing focus
-                root.attributes("-topmost", True)
-                root.after(900, refresh)
+                user32.SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE)
+                user32.InvalidateRect(hwnd, None, True)
+                return 0
+            elif msg == WM_PAINT:
+                ps = _PAINTSTRUCT()
+                hdc = user32.BeginPaint(hwnd, ctypes.byref(ps))
+                if hdc:
+                    rc = wintypes.RECT(0, 0, 260, 114)
+                    user32.FillRect(hdc, ctypes.byref(rc), bg_brush)
+                    user32.FrameRect(hdc, ctypes.byref(rc), border_brush)
+                    gdi32.SetBkMode(hdc, 1)  # TRANSPARENT
 
-            root.after(400, refresh)
-            root.mainloop()
+                    gdi32.SelectObject(hdc, font_hdr)
+                    gdi32.SetTextColor(hdc, 0x0080DE4A)  # BGR #4ADE80 (green)
+                    r_hdr = wintypes.RECT(10, 8, 250, 26)
+                    user32.DrawTextW(hdc, hdr_text, -1, ctypes.byref(r_hdr), 0)
+
+                    gdi32.SelectObject(hdc, font_body)
+                    gdi32.SetTextColor(hdc, 0x00F3EDE6)  # BGR #E6EDF3 (off-white)
+                    r_body = wintypes.RECT(10, 28, 250, 108)
+                    user32.DrawTextW(hdc, body_text, -1, ctypes.byref(r_body), 0)
+
+                    user32.EndPaint(hwnd, ctypes.byref(ps))
+                return 0
+            elif msg == WM_DESTROY:
+                user32.PostQuitMessage(0)
+                return 0
+            return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
+
+        wnd_proc_cb = WNDPROC(wnd_proc)
+        hinst = kernel32.GetModuleHandleW(None)
+        cls_name = f"KRPerfHudOverlay_{os.getpid()}_{int(time.time()*1000)}"
+
+        wc = _WNDCLASSEXW()
+        wc.cbSize = ctypes.sizeof(_WNDCLASSEXW)
+        wc.lpfnWndProc = wnd_proc_cb
+        wc.hInstance = hinst
+        wc.hbrBackground = bg_brush
+        wc.lpszClassName = cls_name
+
+        try:
+            user32.RegisterClassExW(ctypes.byref(wc))
+            ex_style = 0x00080000 | 0x00000020 | 0x00000080 | 0x08000000 | 0x00000008
+            # WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_TOPMOST
+            ws_popup = 0x80000000
+            hwnd = user32.CreateWindowExW(
+                ex_style, cls_name, "KR Perf HUD", ws_popup,
+                16, 16, 260, 114, None, None, hinst, None
+            )
+            if not hwnd:
+                return
+
+            # 85% opacity (217/255)
+            user32.SetLayeredWindowAttributes(hwnd, 0, 217, 0x00000002)
+            user32.ShowWindow(hwnd, 4)  # SW_SHOWNOACTIVATE
+            user32.UpdateWindow(hwnd)
+            user32.SetTimer(hwnd, 1, 900, None)
+
+            msg = wintypes.MSG()
+            while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
+                user32.TranslateMessage(ctypes.byref(msg))
+                user32.DispatchMessageW(ctypes.byref(msg))
         except Exception as e:
-            print(f"[PERF HUD] Overlay notice: {e}")
+            print(f"[PERF HUD] Win32 overlay notice: {e}")
         finally:
             mon.stop()
+            for obj in (bg_brush, border_brush, font_hdr, font_body):
+                try:
+                    gdi32.DeleteObject(obj)
+                except Exception:
+                    pass
+            try:
+                user32.UnregisterClassW(cls_name, hinst)
+            except Exception:
+                pass
