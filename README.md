@@ -57,6 +57,15 @@ Built specifically around the heroic trio:
   - **Balanced Experience:** 1080p + AMD FSR 3.1 Quality (67%) + 60 FPS
   - **Ultra Fidelity:** 1080p / 1440p / 4K Native + 60 FPS
 
+### Built-in Indonesian Subtitle Patch (Bakka Sub x AO Zero)
+- **1-Click Subtitle Switcher in Settings:** Toggle between **Original (English / Japanese)** and **Bahasa Indonesia (Bakka Sub x AO Zero Built-in)** directly inside the **Settings (Pengaturan)** tab.
+- **Pure-Python Unity 2017.4 Patcher (`scripts/indo_patcher.py`):** Safely patches `CUSA17374/Media/sharedassets0.assets` using `patches/id_patch.json` with zero external dependencies and full UTF-8 support.
+- **Automatic Vanilla Backup & Restore:** Creates an untouched backup of your original game file in `bin/user/vanilla_backup/` before patching, allowing instant 1-click restoration back to Original (EN/JP) anytime.
+
+### Neubrutalism UI (Dark Mode Default + Light Mode Toggle)
+- Bold, crisp Neubrutalist desktop interface with zero blurs, zero gradients, high-contrast typography, tactile offset shadows, and monochrome SVG icons.
+- Switch between **Dark Mode** (default) and **Light Mode** anytime from the top header.
+
 ### Full Bilingual Support (Indonesian & English)
 - **Instant Reactive Language Switcher:** Switch between **Bahasa Indonesia (ID)** and **English (EN)** with a single click on the header button (`ID / EN`) or inside the Tools tab.
 - All UI text, tab names, settings descriptions, and trophy logs update seamlessly in real time.
@@ -98,9 +107,18 @@ Built specifically around the heroic trio:
 
 > **No Game Assets Included**: This repository and release packages contain **ONLY** the launcher and optimization runtime tools. You must provide your own legally dumped copy of the game.
 
-### Step 1: Download the Launcher
-- Download **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.0.1.zip`** from the [Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) tab and extract it to a folder of your choice.
-- This repository is a **source reference only**. The complete, ready-to-run launcher ships inside the ZIP above.
+### Step 1: Download the Launcher (or Build from Source)
+- **Ready-to-Run:** Download **`Kamen-Rider-Memory-of-Heroes-PC-Edition-v1.1.0.zip`** from the [Releases](https://github.com/ao-zero/kamen-rider-memory-of-heroes-pc/releases) tab and extract it to a folder of your choice.
+- **Build from Source (Open-Source):**
+  ```powershell
+  git clone https://github.com/ao-zero/Kamen-Rider-Memory-of-Heroes-PC.git
+  cd Kamen-Rider-Memory-of-Heroes-PC
+  pip install -r requirements.txt
+  # Run directly with Python:
+  python launcher.py
+  # Or compile standalone .exe with PyInstaller:
+  build.bat
+  ```
 
 ### Step 2: Add Your Game Dump
 Place your extracted PS4 base game dump (*CUSA17374*) into the `CUSA17374` folder:

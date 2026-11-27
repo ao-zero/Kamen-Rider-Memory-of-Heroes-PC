@@ -15,14 +15,13 @@ Kamen-Rider-Memory-of-Heroes-PC-Edition/
 Kamen-Rider-Memory-of-Heroes-PC/
 dist/
 build/
-*.spec
 *.spec.bak
 github_push.bat
+push_to_github.bat
 README-PC.txt
 
-# Protected Source & Build Scripts
-launcher.py
-build.bat
+# Local Vanilla Patch Backup (Copyrighted Game Assets Backup)
+bin/user/vanilla_backup/
 
 # Python Runtime & Bytecode
 __pycache__/

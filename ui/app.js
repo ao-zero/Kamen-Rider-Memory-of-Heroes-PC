@@ -24,6 +24,13 @@ const I18N = {
     section_game: "Informasi Game",
     profile: "Profil:",
     mode: "Mode:",
+    lbl_sub_short: "Sub:",
+    section_indo_patch: "Patch Bahasa Indonesia (Built-in Subtitle)",
+    indo_patch_desc: "Terjemahkan teks menu, tutorial, dan dialog cerita game ke Bahasa Indonesia gaya fansub Bakka Sub secara otomatis. File asli game otomatis di-backup dan bisa dikembalikan kapan saja.",
+    opt_sub_orig: "Original (English / Japanese)",
+    opt_sub_indo: "Bahasa Indonesia (Bakka Sub x AO Zero Built-in)",
+    btn_apply_patch: "Terapkan",
+    lbl_patch_info: "Info Patch:",
     btn_change_folder: "Change game folder...",
     btn_play: "PLAY GAME",
     btn_create_shortcut: "Create Desktop Shortcut",
@@ -80,7 +87,7 @@ const I18N = {
     filter_locked: "Terkunci",
     btn_test_trophy: "Tes Notifikasi",
     section_updates: "Updates & Versi",
-    installed_ver: "Versi Terpasang: v1.0.1-PC-Native",
+    installed_ver: "Versi Terpasang: v1.1.0-PC-Native",
     btn_check_updates: "Check for Updates",
     chk_update_startup: "Check for updates when the launcher opens",
     section_installation: "Pengaturan & Migrasi Instalasi",
@@ -122,6 +129,13 @@ const I18N = {
     section_game: "Game Information",
     profile: "Profile:",
     mode: "Mode:",
+    lbl_sub_short: "Sub:",
+    section_indo_patch: "Indonesian Subtitle Patch (Built-in)",
+    indo_patch_desc: "Translate menus, tutorials, and story dialogue into natural Bakka Sub-style Indonesian automatically. Original game files are backed up safely and can be restored anytime.",
+    opt_sub_orig: "Original (English / Japanese)",
+    opt_sub_indo: "Bahasa Indonesia (Bakka Sub x AO Zero Built-in)",
+    btn_apply_patch: "Apply",
+    lbl_patch_info: "Patch Info:",
     btn_change_folder: "Change game folder...",
     btn_play: "PLAY GAME",
     btn_create_shortcut: "Create Desktop Shortcut",
@@ -178,7 +192,7 @@ const I18N = {
     filter_locked: "Locked",
     btn_test_trophy: "Test Notification",
     section_updates: "Updates & Version",
-    installed_ver: "Installed Version: v1.0.1-PC-Native",
+    installed_ver: "Installed Version: v1.1.0-PC-Native",
     btn_check_updates: "Check for Updates",
     chk_update_startup: "Check for updates when the launcher opens",
     section_installation: "Settings & Installation Migration",
@@ -206,12 +220,129 @@ const I18N = {
 };
 
 let currentLang = 'id';
+let currentTheme = 'dark';
+let indoPatchEnabled = false;
+let indoPatchBusy = false;
 let cachedKeybinds = {};
 let cachedTrophies = [];
 let activeTrophyFilter = 'all';
 let currentMappingAction = null;
 let initStarted = false;
 let initDone = false;
+
+// ==========================================================================
+// THEME SWITCHER (NEUBRUTALISM DARK / LIGHT)
+// ==========================================================================
+function applyTheme(theme, persist) {
+  currentTheme = (theme === 'light') ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  const lbl = document.getElementById('themeLabel');
+  if (lbl) lbl.textContent = currentTheme === 'dark' ? 'DARK' : 'LIGHT';
+  const svg = document.getElementById('themeIconSvg');
+  if (svg) {
+    if (currentTheme === 'dark') {
+      svg.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    } else {
+      svg.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    }
+  }
+  if (persist) onSettingChanged();
+}
+
+function toggleTheme() {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark', true);
+}
+
+// ==========================================================================
+// BUILT-IN INDONESIAN SUBTITLE PATCH (BAKKA SUB X AO ZERO)
+// ==========================================================================
+function updateIndoPatchUI(status) {
+  const pill = document.getElementById('patchStatusPill');
+  const sel = document.getElementById('selectIndoPatch');
+  const subTag = document.getElementById('lblSubStatus');
+  const meta = document.getElementById('indoPatchMeta');
+  const btn = document.getElementById('btnApplyIndoPatch');
+
+  if (!status) return;
+  indoPatchEnabled = !!status.applied;
+
+  if (sel) sel.value = indoPatchEnabled ? 'on' : 'off';
+
+  if (pill) {
+    pill.classList.remove('active', 'original', 'working', 'error');
+    if (!status.game_found) {
+      pill.classList.add('error');
+      pill.textContent = currentLang === 'id' ? 'GAME BELUM DITEMUKAN' : 'GAME NOT FOUND';
+    } else if (indoPatchEnabled) {
+      pill.classList.add('active');
+      pill.textContent = `AKTIF • BAKKA SUB v${status.version || '1.0.0'}`;
+    } else {
+      pill.classList.add('original');
+      pill.textContent = 'ORIGINAL (EN/JP)';
+    }
+  }
+
+  if (subTag) {
+    if (indoPatchEnabled) {
+      subTag.className = 'tag-sub-id';
+      subTag.textContent = 'Indonesia (Bakka Sub)';
+    } else {
+      subTag.className = 'tag-sub-orig';
+      subTag.textContent = 'Original (EN/JP)';
+    }
+  }
+
+  if (meta) {
+    const cnt = status.translated_count || 0;
+    const bak = status.backup_exists
+      ? (currentLang === 'id' ? 'Backup vanilla aman' : 'Vanilla backup safe')
+      : (currentLang === 'id' ? 'Backup otomatis saat pertama aktif' : 'Auto-backup on first apply');
+    meta.innerHTML = `<strong>${I18N[currentLang].lbl_patch_info}</strong> Bakka Sub x AO Zero v${status.version || '1.0.0'} • ${cnt} ${currentLang === 'id' ? 'baris teks' : 'strings'} • ${bak}`;
+  }
+
+  if (btn) btn.disabled = indoPatchBusy || !status.game_found;
+}
+
+function onIndoPatchSelect(val) {
+  // Auto-apply when user changes dropdown
+  applyIndoPatchNow();
+}
+
+function applyIndoPatchNow() {
+  if (indoPatchBusy || !window.pywebview || !window.pywebview.api) return;
+  const sel = document.getElementById('selectIndoPatch');
+  const wantEnabled = sel ? (sel.value === 'on') : false;
+
+  indoPatchBusy = true;
+  const pill = document.getElementById('patchStatusPill');
+  const btn = document.getElementById('btnApplyIndoPatch');
+  if (pill) {
+    pill.className = 'patch-status-pill working';
+    pill.textContent = wantEnabled
+      ? (currentLang === 'id' ? 'MEMASANG PATCH...' : 'APPLYING PATCH...')
+      : (currentLang === 'id' ? 'MENGEMBALIKAN ORIGINAL...' : 'RESTORING ORIGINAL...');
+  }
+  if (btn) btn.disabled = true;
+
+  window.pywebview.api.set_indo_patch(wantEnabled).catch(err => {
+    indoPatchBusy = false;
+    alert('Patch Error: ' + err);
+    if (btn) btn.disabled = false;
+  });
+}
+
+window.onIndoPatchDone = function(res) {
+  indoPatchBusy = false;
+  if (res && res.status) {
+    updateIndoPatchUI(res.status);
+  }
+  if (res && res.message) {
+    appendLog(`[PATCH-ID] ${res.message}`);
+    if (!res.success) {
+      alert(res.message);
+    }
+  }
+};
 
 // ==========================================================================
 // LANGUAGE SWITCHER
@@ -298,15 +429,15 @@ function clearLog() {
 
 // Gamepad changed notification
 window.onGamepadChanged = function(name) {
-  const badge = document.getElementById('badgeGamepad');
-  if (badge) badge.textContent = `🎮 ${name}`;
+  const badgeText = document.getElementById('badgeGamepadText');
+  if (badgeText) badgeText.textContent = name;
 
   const cbox = document.getElementById('controllerStatusBox');
   if (cbox) {
     cbox.textContent = name.toLowerCase().includes('keyboard') 
-      ? `○ ACTIVE: ${name} (Connect Xbox or PlayStation controller anytime)`
-      : `● CONNECTED: ${name}`;
-    cbox.style.color = name.toLowerCase().includes('keyboard') ? '#94A3B8' : '#34D399';
+      ? `ACTIVE: ${name} (Connect Xbox or PlayStation controller anytime)`
+      : `CONNECTED: ${name}`;
+    cbox.style.color = name.toLowerCase().includes('keyboard') ? 'var(--text-muted)' : 'var(--ready)';
   }
 };
 
@@ -330,9 +461,13 @@ function initLauncher() {
   if (window.pywebview && window.pywebview.api) {
     initStarted = true;
     window.pywebview.api.get_initial_data().then(data => {
-      // 1. Language (do NOT persist yet: settings controls are still at HTML defaults)
+      // 1. Language & Theme (do NOT persist yet: settings controls are still at HTML defaults)
       if (data.language) {
         applyLanguage(data.language, false);
+      }
+      applyTheme(data.theme || 'dark', false);
+      if (data.indo_patch_status) {
+        updateIndoPatchUI(data.indo_patch_status);
       }
 
       // 2. Paths & Player Name
@@ -425,7 +560,9 @@ function onSettingChanged() {
     hide_launcher_on_play: document.getElementById('chkHideLauncher').checked,
     check_updates_startup: document.getElementById('chkUpdateStartup').checked,
     audio_volume: document.getElementById('rngVolume').value,
-    language: currentLang
+    language: currentLang,
+    theme: currentTheme,
+    indo_patch: indoPatchEnabled
   };
   window.pywebview.api.save_settings(settings);
 }
@@ -518,7 +655,9 @@ function renderSaveSlots(slots) {
     const card = document.createElement('div');
     card.className = `save-slot-card ${slot.has_data ? 'active-save' : ''}`;
     card.innerHTML = `
-      <div class="save-icon">${slot.folder === 'KmrSave' ? '⚙️' : '🎮'}</div>
+      <div class="save-icon">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      </div>
       <div class="save-details">
         <div class="save-title">${slot.title}</div>
         <div class="save-meta">${slot.folder} • ${slot.size_kb} KB • ${slot.last_modified}</div>
@@ -542,7 +681,7 @@ function renderBackups(backups) {
   backups.forEach(b => {
     const opt = document.createElement('option');
     opt.value = b.name;
-    opt.textContent = `📦 ${b.name} (${b.size_kb} KB - ${b.date})`;
+    opt.textContent = `[BACKUP] ${b.name} (${b.size_kb} KB - ${b.date})`;
     select.appendChild(opt);
   });
 }
@@ -684,8 +823,8 @@ function previewTrophyPopup(trophyId) {
   if (tier) tier.textContent = trophy.type.toUpperCase();
   if (title) title.textContent = name;
   if (descEl) descEl.textContent = desc;
-  const badgeEl = toast.querySelector('.ps4-toast-badge');
-  if (badgeEl) badgeEl.textContent = '🏆 ACHIEVEMENT UNLOCKED';
+  const badgeEl = toast.querySelector('.ps4-toast-badge span');
+  if (badgeEl) badgeEl.textContent = 'ACHIEVEMENT UNLOCKED';
 
   // Play authentic PlayStation trophy unlock chime
   try {
